@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/ui/SEO';
 import { useTranslation } from 'react-i18next';
 import { useLang } from '../context/LanguageContext';
 import AboutSection from '../components/sections/AboutSection';
@@ -11,10 +11,10 @@ export default function About() {
 
   return (
     <>
-      <Helmet>
-        <title>{t('nav.about')} | الهشام للتطوير العقاري</title>
-        <meta name="description" content={t('about.description')} />
-      </Helmet>
+      <SEO 
+        title={t('nav.about')} 
+        description="تعرف على شركة الهشام للتطوير العقاري ورؤيتنا في بناء مستقبل عقاري مستدام." 
+      />
 
       {/* Page Hero */}
       <div className="relative pt-32 pb-20 bg-dark overflow-hidden">

@@ -56,25 +56,27 @@ export default function HeroSection() {
       className="relative w-full h-screen min-h-[850px] overflow-hidden flex items-center"
       onMouseMove={handleMouseMove}
     >
-      {/* Background Images with Parallax */}
+      {/* Video Background with Parallax */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentImg}
+          key="hero-video"
           className="absolute inset-0"
           style={{ x: bgX, y: bgY, scale: 1.05 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           transition={{ duration: 1.4 }}
         >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${heroImages[currentImg]})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            poster="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=90"
+          >
+            {/* Cinematic Real Estate Drone Video Placeholder */}
+            <source src="https://cdn.pixabay.com/video/2021/08/11/84687-587216124_large.mp4" type="video/mp4" />
+          </video>
         </motion.div>
       </AnimatePresence>
 
@@ -179,19 +181,6 @@ export default function HeroSection() {
           transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
         />
       </motion.div>
-
-      {/* Image indicators */}
-      <div className="absolute bottom-8 right-8 flex gap-2 z-10">
-        {heroImages.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentImg(i)}
-            className={`transition-all duration-500 rounded-full ${
-              i === currentImg ? 'w-8 h-2 bg-gold' : 'w-2 h-2 bg-white/40 hover:bg-white/70'
-            }`}
-          />
-        ))}
-      </div>
     </section>
   );
 }

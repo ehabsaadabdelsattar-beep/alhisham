@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/ui/SEO';
 import { useTranslation } from 'react-i18next';
 import { useLang } from '../context/LanguageContext';
 
@@ -19,10 +19,10 @@ export default function Contact() {
 
   return (
     <>
-      <Helmet>
-        <title>{t('nav.contact')} | الهشام للتطوير العقاري</title>
-        <meta name="description" content="تواصل مع الهشام للتطوير العقاري للاستفسارات والطلبات والاستشارات العقارية." />
-      </Helmet>
+      <SEO 
+        title={t('nav.contact')} 
+        description="تواصل مع الهشام للتطوير العقاري للحصول على استشارة عقارية أو الاستفسار عن مشاريعنا." 
+      />
 
       {/* Page Hero */}
       <div className="relative pt-32 pb-20 bg-dark overflow-hidden">

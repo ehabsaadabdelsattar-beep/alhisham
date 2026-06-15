@@ -76,7 +76,7 @@ export default function StatsSection() {
       ),
     },
     {
-      end: 87,
+      end: 120,
       suffix: '+',
       label: t('stats.projects'),
       icon: (
@@ -86,7 +86,7 @@ export default function StatsSection() {
       ),
     },
     {
-      end: 1240,
+      end: 500,
       suffix: '+',
       label: t('stats.clients'),
       icon: (
@@ -96,7 +96,7 @@ export default function StatsSection() {
       ),
     },
     {
-      end: 850000,
+      end: 2000000,
       suffix: '+',
       label: t('stats.sqm'),
       icon: (

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/ui/SEO';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '../context/LanguageContext';
@@ -64,10 +64,10 @@ export default function Projects() {
 
   return (
     <>
-      <Helmet>
-        <title>مشاريعنا | الهشام للتطوير العقاري</title>
-        <meta name="description" content="استعرض مشاريع الهشام للتطوير العقاري - مشاريع سكنية وتجارية ومتعددة الاستخدامات." />
-      </Helmet>
+      <SEO 
+        title={t('nav.projects')} 
+        description="استعرض مشاريع الهشام للتطوير العقاري - مشاريع سكنية وتجارية ومتعددة الاستخدامات." 
+      />
 
       {/* Page Hero */}
       <div className="relative pt-32 pb-20 bg-dark overflow-hidden">

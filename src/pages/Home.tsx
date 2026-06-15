@@ -1,8 +1,10 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/ui/SEO';
 import HeroSection from '../components/sections/HeroSection';
 import StatsSection from '../components/sections/StatsSection';
+import FeaturesSection from '../components/sections/FeaturesSection';
 import AboutSection from '../components/sections/AboutSection';
+import TimelineSection from '../components/sections/TimelineSection';
 import ServicesSection from '../components/sections/ServicesSection';
 import ProjectsSection from '../components/sections/ProjectsSection';
 import BeforeAfterSection from '../components/sections/BeforeAfterSection';
@@ -15,14 +17,15 @@ import CTASection from '../components/sections/CTASection';
 export default function Home() {
   return (
     <>
-      <Helmet>
-        <title>الهشام للتطوير العقاري | AL HISHAM DEVELOPMENT</title>
-        <meta name="description" content="شركة الهشام للتطوير العقاري - نبني المستقبل ونصنع قيمة عقارية مستدامة. مشاريع سكنية وتجارية فاخرة، استشارات هندسية، إدارة أصول عقارية." />
-        <link rel="canonical" href="https://alhishamdevelopment.com/" />
-      </Helmet>
+      <SEO 
+        title="الرئيسية" 
+        description="شركة الهشام للتطوير العقاري - نبني المستقبل ونصنع قيمة عقارية مستدامة. مشاريع سكنية وتجارية فاخرة، استشارات هندسية، إدارة أصول عقارية." 
+      />
       <HeroSection />
       <StatsSection />
+      <FeaturesSection />
       <AboutSection />
+      <TimelineSection />
       <ServicesSection />
       <ProjectsSection />
       <BeforeAfterSection />

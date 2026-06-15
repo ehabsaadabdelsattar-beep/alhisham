@@ -1,0 +1,425 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #1B4332;
+  --primary-light: #2D6A4F;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --dark: #0A0A0A;
+  --surface: #F8F8F6;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Tajawal', 'Outfit', sans-serif;
+  background-color: var(--surface);
+  color: var(--dark);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: #0A0A0A;
+  color: #F8F8F6;
+}
+
+/* RTL / LTR Support */
+[dir="ltr"] {
+  font-family: 'Outfit', sans-serif;
+}
+
+[dir="rtl"] {
+  font-family: 'Tajawal', sans-serif;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #1B4332;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A84C;
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-semibold rounded-none
+           hover:bg-primary-light transition-all duration-300 hover:shadow-green hover:-translate-y-0.5
+           border border-primary hover:border-primary-light text-sm tracking-widest uppercase;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center gap-2 px-8 py-4 bg-gold text-dark font-semibold rounded-none
+           hover:bg-gold-light transition-all duration-300 hover:shadow-gold hover:-translate-y-0.5
+           border border-gold text-sm tracking-widest uppercase;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center gap-2 px-8 py-4 bg-transparent text-white font-semibold rounded-none
+           border border-white hover:bg-white hover:text-dark transition-all duration-300
+           text-sm tracking-widest uppercase;
+  }
+
+  .btn-outline-primary {
+    @apply inline-flex items-center gap-2 px-8 py-4 bg-transparent text-primary font-semibold rounded-none
+           border border-primary hover:bg-primary hover:text-white transition-all duration-300
+           text-sm tracking-widest uppercase;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-dark dark:text-white leading-tight;
+  }
+
+  .section-subtitle {
+    @apply text-gold font-medium tracking-[0.3em] uppercase text-sm mb-4;
+  }
+
+  .card-luxury {
+    @apply bg-white dark:bg-dark-200 shadow-luxury hover:shadow-luxury-dark 
+           transition-all duration-500 hover:-translate-y-2 overflow-hidden;
+  }
+
+  .gold-divider {
+    @apply w-16 h-0.5 bg-gold-gradient my-4;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-20 md:py-28 lg:py-36;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #C9A84C 0%, #E8C96A 50%, #A8852E 100%);
+  }
+
+  .text-gradient-green {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #1B4332 0%, #40916C 100%);
+  }
+
+  .overlay-dark {
+    @apply absolute inset-0 bg-black/60;
+  }
+
+  .overlay-gradient {
+    @apply absolute inset-0;
+    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.5) 50%, transparent 100%);
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-card-dark {
+    @apply bg-black/20 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-card-premium {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl;
+  }
+
+  .premium-shadow {
+    box-shadow: 0 4px 40px -8px rgba(0, 0, 0, 0.08), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  }
+
+  .premium-shadow-dark {
+    box-shadow: 0 8px 60px -12px rgba(0, 0, 0, 0.3), 0 4px 16px -4px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-link {
+    @apply relative text-sm font-medium tracking-wide transition-colors duration-200
+           after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gold
+           after:transition-all after:duration-300 hover:after:w-full hover:text-gold;
+  }
+}
+
+/* ============================================================
+   HERO VIDEO BACKGROUND
+   ============================================================ */
+
+.hero-video-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hero-video-container video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* ============================================================
+   BEFORE/AFTER SLIDER
+   ============================================================ */
+
+.before-after-container {
+  position: relative;
+  overflow: hidden;
+  cursor: col-resize;
+  user-select: none;
+}
+
+.before-after-slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #C9A84C;
+  z-index: 10;
+  cursor: col-resize;
+}
+
+.before-after-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  background: #C9A84C;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.6);
+}
+
+/* ============================================================
+   MARQUEE / PARTNER LOGOS
+   ============================================================ */
+
+.marquee-container {
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 60px;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   SWIPER CUSTOM
+   ============================================================ */
+
+.swiper-pagination-bullet {
+  background: #C9A84C !important;
+  opacity: 0.4;
+  width: 8px;
+  height: 8px;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1 !important;
+  width: 24px;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #C9A84C !important;
+  background: rgba(27, 67, 50, 0.8);
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50%;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px !important;
+}
+
+/* ============================================================
+   FAQ ACCORDION
+   ============================================================ */
+
+.faq-item {
+  border-bottom: 1px solid rgba(27, 67, 50, 0.15);
+}
+
+.faq-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+.faq-content.open {
+  max-height: 500px;
+}
+
+/* ============================================================
+   WHATSAPP FLOAT BUTTON
+   ============================================================ */
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 9999;
+  animation: float 3s ease-in-out infinite;
+}
+
+[dir="ltr"] .whatsapp-float {
+  right: 24px;
+  left: auto;
+}
+
+[dir="rtl"] .whatsapp-float {
+  left: 24px;
+  right: auto;
+}
+
+/* ============================================================
+   AI CHAT BUTTON
+   ============================================================ */
+
+.ai-chat-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+}
+
+[dir="ltr"] .ai-chat-float {
+  right: 24px;
+  left: auto;
+}
+
+[dir="rtl"] .ai-chat-float {
+  left: 24px;
+  right: auto;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+
+.progress-bar {
+  height: 6px;
+  background: rgba(27, 67, 50, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1B4332, #40916C);
+  border-radius: 3px;
+  transition: width 1.5s ease-out;
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+.dark .card-luxury {
+  background: #1A1A1A;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   LOADING SKELETON
+   ============================================================ */
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ============================================================
+   CUSTOM SELECTION
+   ============================================================ */
+
+::selection {
+  background: rgba(27, 67, 50, 0.2);
+  color: #1B4332;
+}
+
+/* ============================================================
+   RESPONSIVE TYPOGRAPHY
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+.animation-delay-600 { animation-delay: 0.6s; }

@@ -30,6 +30,11 @@ export interface Project {
   features?: string[];
   price_from?: number;
   price_to?: number;
+  expected_roi?: string;
+  payment_plan_ar?: string;
+  payment_plan_en?: string;
+  brochure_url?: string;
+  master_plan_url?: string;
   seo_title?: string;
   seo_description?: string;
   featured: boolean;

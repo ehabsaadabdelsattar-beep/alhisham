@@ -136,6 +136,7 @@ export default function AdminProjectForm() {
     { key: 'basic', label: 'المعلومات الأساسية' },
     { key: 'details', label: 'التفاصيل والموقع' },
     { key: 'media', label: 'الوسائط' },
+    { key: 'investor', label: 'الاستثمار والمستندات' },
     { key: 'seo', label: 'إعدادات SEO' },
   ] as const;
 
@@ -457,6 +458,39 @@ export default function AdminProjectForm() {
                   <input type="url" name="cover_image" value={formData.cover_image || ''} onChange={handleChange} className={`${InputClass} font-mono text-xs`} dir="ltr" />
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== TAB: INVESTOR ===== */}
+        {activeTab === 'investor' && (
+          <div className="bg-white dark:bg-dark-light rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-5">
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl text-sm text-amber-700 dark:text-amber-400">
+              هذه الحقول اختيارية وتظهر في صفحة المشروع فقط إذا كانت ممتلئة.
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className={LabelClass}>العائد الاستثماري المتوقع (Expected ROI)</label>
+                <input type="text" name="expected_roi" value={(formData as any).expected_roi || ''} onChange={handleChange} className={InputClass} placeholder="مثال: 12% - 15% سنوياً" dir="auto" />
+              </div>
+              <div>
+                <label className={LabelClass}>رابط البروشور (Brochure PDF URL)</label>
+                <input type="url" name="brochure_url" value={(formData as any).brochure_url || ''} onChange={handleChange} className={InputClass} placeholder="https://..." dir="ltr" />
+              </div>
+              <div>
+                <label className={LabelClass}>رابط المخطط العام (Master Plan URL)</label>
+                <input type="url" name="master_plan_url" value={(formData as any).master_plan_url || ''} onChange={handleChange} className={InputClass} placeholder="https://..." dir="ltr" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className={LabelClass}>خطة الدفع (عربي)</label>
+                <textarea name="payment_plan_ar" value={(formData as any).payment_plan_ar || ''} onChange={handleChange} className={InputClass} rows={3} placeholder="مثال: مقدم 10% وتقسيط على 7 سنوات" dir="rtl" />
+              </div>
+              <div>
+                <label className={LabelClass}>خطة الدفع (إنجليزي)</label>
+                <textarea name="payment_plan_en" value={(formData as any).payment_plan_en || ''} onChange={handleChange} className={InputClass} rows={3} placeholder="e.g. 10% Down, 7-year installments" dir="ltr" />
+              </div>
             </div>
           </div>
         )}

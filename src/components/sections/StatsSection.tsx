@@ -35,10 +35,12 @@ function StatItem({ end, suffix = '', prefix = '', label, duration = 2000, shoul
       animate={shouldStart ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.1 }}
     >
-      <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white font-english tabular-nums tracking-tight mb-2">
-        {prefix}<span className="text-gradient-gold">{count.toLocaleString()}</span>{suffix}
+      <div dir="ltr" className="flex items-baseline justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-white font-english tabular-nums tracking-tight mb-2 whitespace-nowrap">
+        {prefix && <span className="text-gradient-gold mr-1">{prefix}</span>}
+        <span className="text-gradient-gold">{count.toLocaleString()}</span>
+        {suffix && <span className="text-lg sm:text-xl md:text-2xl text-white ml-2 font-arabic">{suffix}</span>}
       </div>
-      <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-medium text-center">{label}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-medium text-center mt-2">{label}</p>
     </motion.div>
   );
 }
@@ -49,10 +51,10 @@ export default function StatsSection() {
   const isInView = useInView(ref, { once: true, margin: '-50px' });
 
   const stats = [
-    { end: 15, suffix: '+', label: t('stats.years') },
-    { end: 87, suffix: '+', label: t('stats.projects') },
-    { end: 1240, suffix: '+', label: t('stats.clients') },
-    { end: 850000, suffix: '+ م²', label: t('stats.sqm') },
+    { end: 15, prefix: '+', label: t('stats.years') },
+    { end: 87, prefix: '+', label: t('stats.projects') },
+    { end: 1240, prefix: '+', label: t('stats.clients') },
+    { end: 850000, prefix: '+', suffix: 'م²', label: t('stats.sqm') },
   ];
 
   return (

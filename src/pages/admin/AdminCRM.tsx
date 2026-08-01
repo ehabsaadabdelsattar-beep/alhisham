@@ -2,8 +2,10 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { crmService, Lead, LeadStatus, LeadSource, InquiryNote, CRMAnalytics } from '../../services/crm';
-import { projectsService, Project } from '../../services/projects';
+import { crmService } from '../../services/crm';
+import type { Lead, LeadStatus, LeadSource, InquiryNote, CRMAnalytics } from '../../services/crm';
+import { projectsService } from '../../services/projects';
+import type { Project } from '../../services/projects';
 import {
   FiTarget, FiPhone, FiMail, FiMessageCircle, FiUser, FiCalendar,
   FiEdit3, FiX, FiPlus, FiSearch, FiDownload, FiClock, FiAlertCircle,

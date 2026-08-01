@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { financeService, Expense } from '../../services/finance';
+import { financeService } from '../../services/finance';
+import type { Expense } from '../../services/finance';
 import {
   FiCreditCard, FiFilter, FiDownload, FiPlus, FiSearch,
   FiEdit3, FiXCircle, FiX

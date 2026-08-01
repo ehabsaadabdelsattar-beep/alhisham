@@ -2,8 +2,10 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { financeService, Transaction } from '../../services/finance';
-import { projectsService, Project } from '../../services/projects';
+import { financeService } from '../../services/finance';
+import type { Transaction } from '../../services/finance';
+import { projectsService } from '../../services/projects';
+import type { Project } from '../../services/projects';
 import {
   FiDollarSign, FiFilter, FiDownload, FiPlus, FiSearch,
   FiEdit3, FiCheckCircle, FiXCircle, FiClock, FiRefreshCw,

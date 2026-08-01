@@ -333,6 +333,10 @@ export default function ProjectDetail() {
     window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank');
   };
 
+  const sendToWhatsApp = () => {
+    whatsAppMsg(contactForm.name, contactForm.phone);
+  };
+
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (contactSubmitting) return;

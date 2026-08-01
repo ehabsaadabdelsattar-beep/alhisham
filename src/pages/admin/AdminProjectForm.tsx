@@ -34,7 +34,7 @@ export default function AdminProjectForm() {
   const [initialLoading, setInitialLoading] = useState(isEdit);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'media' | 'seo'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'media' | 'investor' | 'seo'>('basic');
 
   useEffect(() => {
     if (id) fetchProject();

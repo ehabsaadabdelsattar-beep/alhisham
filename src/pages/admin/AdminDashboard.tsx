@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { dashboardService, DashboardKPIs } from '../../services/dashboard';
+import { dashboardService } from '../../services/dashboard';
+import type { DashboardKPIs } from '../../services/dashboard';
 import { projectsService } from '../../services/projects';
 import type { Project } from '../../services/projects';
 import {

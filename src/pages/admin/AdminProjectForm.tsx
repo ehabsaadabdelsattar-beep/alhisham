@@ -15,8 +15,10 @@ const INITIAL_STATE: Partial<Project> = {
   category: 'residential', status: 'upcoming',
   progress: 0, area: '', units: 0,
   location_ar: '', location_en: '',
+  location_name: '',
   address_ar: '', address_en: '',
   google_maps_url: '',
+  latitude: undefined, longitude: undefined,
   price_from: undefined, price_to: undefined,
   seo_title: '', seo_description: '',
   featured: false, published: true,
@@ -338,9 +340,77 @@ export default function AdminProjectForm() {
                 <label className={LabelClass}>تاريخ الإنجاز المتوقع</label>
                 <input type="date" name="completion_date" value={formData.completion_date || ''} onChange={handleChange} className={InputClass} dir="ltr" />
               </div>
+              {/* Location Name */}
               <div className="md:col-span-2">
-                <label className={LabelClass}>رابط خرائط جوجل</label>
-                <input type="url" name="google_maps_url" value={formData.google_maps_url || ''} onChange={handleChange} className={InputClass} placeholder="https://maps.google.com/..." dir="ltr" />
+                <label className={LabelClass}>اسم الموقع (Location Name)</label>
+                <input
+                  type="text"
+                  name="location_name"
+                  value={formData.location_name || ''}
+                  onChange={handleChange}
+                  className={InputClass}
+                  placeholder="مثال: القاهرة الجديدة، مصر / New Cairo, Egypt"
+                />
+                <p className="mt-1 text-xs text-gray-400">يُستخدم كعنوان رئيسي للموقع يظهر للزوار</p>
+              </div>
+
+              {/* Coordinates */}
+              <div>
+                <label className={LabelClass}>خط العرض (Latitude)</label>
+                <input
+                  type="number"
+                  name="latitude"
+                  value={formData.latitude ?? ''}
+                  onChange={handleChange}
+                  className={InputClass}
+                  placeholder="مثال: 30.0444"
+                  step="any"
+                  min="-90"
+                  max="90"
+                  dir="ltr"
+                />
+                <p className="mt-1 text-xs text-gray-400">قيمة من -90 إلى 90</p>
+              </div>
+              <div>
+                <label className={LabelClass}>خط الطول (Longitude)</label>
+                <input
+                  type="number"
+                  name="longitude"
+                  value={formData.longitude ?? ''}
+                  onChange={handleChange}
+                  className={InputClass}
+                  placeholder="مثال: 31.2357"
+                  step="any"
+                  min="-180"
+                  max="180"
+                  dir="ltr"
+                />
+                <p className="mt-1 text-xs text-gray-400">قيمة من -180 إلى 180</p>
+              </div>
+
+              {/* Map Preview */}
+              {formData.latitude && formData.longitude && (
+                <div className="md:col-span-2">
+                  <label className={LabelClass}>معاينة الخريطة</label>
+                  <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 h-48">
+                    <iframe
+                      title="map-preview"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      src={`https://maps.google.com/maps?q=${formData.latitude},${formData.longitude}&z=15&output=embed`}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">✓ الخريطة تعرض الموقع الدقيق للمشروع</p>
+                </div>
+              )}
+
+              {/* Google Maps URL */}
+              <div className="md:col-span-2">
+                <label className={LabelClass}>رابط خرائط جوجل (Google Maps URL)</label>
+                <input type="url" name="google_maps_url" value={formData.google_maps_url || ''} onChange={handleChange} className={InputClass} placeholder="https://maps.google.com/maps?q=30.0444,31.2357" dir="ltr" />
+                <p className="mt-1 text-xs text-gray-400">رابط مشاركة الموقع — يُستخدم لزر "فتح في خرائط جوجل"</p>
               </div>
               <div className="md:col-span-2">
                 <label className={LabelClass}>رابط فيديو المشروع (YouTube / Vimeo)</label>

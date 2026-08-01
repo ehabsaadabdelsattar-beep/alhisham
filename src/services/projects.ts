@@ -20,6 +20,7 @@ export interface Project {
   location_en?: string;
   address_ar?: string;
   address_en?: string;
+  location_name?: string;
   map_embed_url?: string;
   google_maps_url?: string;
   latitude?: number;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -16,21 +16,113 @@ import SEO from '../components/ui/SEO';
 
 const WHATSAPP = '201103657888';
 
+// ─────────────────────────────────────────────────────────────────
+// Helper: build Google Maps embed URL for a precise project pin
+// Priority: lat+lng > google_maps_url > location text
+// ─────────────────────────────────────────────────────────────────
+function buildMapEmbedUrl(project: Project, fallbackText: string): string | null {
+  // 1. Coordinates → most precise, shows a pin
+  if (project.latitude && project.longitude) {
+    return `https://maps.google.com/maps?q=${project.latitude},${project.longitude}&z=15&output=embed`;
+  }
+
+  // 2. Try to extract coordinates from google_maps_url if it contains @lat,lng pattern
+  if (project.google_maps_url) {
+    const coordMatch = project.google_maps_url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (coordMatch) {
+      return `https://maps.google.com/maps?q=${coordMatch[1]},${coordMatch[2]}&z=15&output=embed`;
+    }
+
+    // 3. If it's a maps.google.com link with a q= param, use it as embed
+    if (
+      project.google_maps_url.includes('maps.google') ||
+      project.google_maps_url.includes('google.com/maps')
+    ) {
+      // Convert share link to embed if needed
+      if (project.google_maps_url.includes('output=embed')) {
+        return project.google_maps_url;
+      }
+      // Try to build an embed from the place URL
+      const placeMatch = project.google_maps_url.match(/place\/([^/]+)/);
+      if (placeMatch) {
+        return `https://maps.google.com/maps?q=${encodeURIComponent(decodeURIComponent(placeMatch[1].replace(/\+/g, ' ')))}&z=14&output=embed`;
+      }
+    }
+  }
+
+  // 4. Fallback: use location text to search on the map
+  if (fallbackText && fallbackText.trim()) {
+    return `https://maps.google.com/maps?q=${encodeURIComponent(fallbackText)}&z=13&output=embed`;
+  }
+
+  return null;
+}
+
+// Build the "Open in Google Maps" link for the button
+function buildMapsOpenUrl(project: Project, fallbackText: string): string {
+  if (project.latitude && project.longitude) {
+    return `https://www.google.com/maps?q=${project.latitude},${project.longitude}`;
+  }
+  if (project.google_maps_url) {
+    return project.google_maps_url;
+  }
+  return `https://www.google.com/maps/search/${encodeURIComponent(fallbackText)}`;
+}
+
+// Status display config
+const STATUS_COLORS: Record<string, string> = {
+  completed:          'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+  under_construction: 'bg-gold/20 text-gold border-gold/40',
+  upcoming:           'bg-blue-500/20 text-blue-400 border-blue-500/40',
+  sold_out:           'bg-red-500/20 text-red-400 border-red-500/40',
+  planning:           'bg-purple-500/20 text-purple-400 border-purple-500/40',
+};
+
+const STATUS_LABELS: Record<string, { ar: string; en: string }> = {
+  completed:          { ar: 'مكتمل', en: 'Completed' },
+  under_construction: { ar: 'قيد الإنشاء', en: 'Under Construction' },
+  upcoming:           { ar: 'قريباً', en: 'Upcoming' },
+  sold_out:           { ar: 'مباع بالكامل', en: 'Sold Out' },
+  planning:           { ar: 'قيد التخطيط', en: 'In Planning' },
+};
+
+const CATEGORY_LABELS: Record<string, { ar: string; en: string }> = {
+  residential: { ar: 'سكني', en: 'Residential' },
+  commercial:  { ar: 'تجاري', en: 'Commercial' },
+  mixed:       { ar: 'متعدد الاستخدامات', en: 'Mixed Use' },
+};
+
+// Format date string to readable format
+function formatDate(dateStr: string | undefined, lang: string): string | null {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr; // Return as-is if invalid date
+    return d.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long' });
+  } catch {
+    return dateStr;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Main Component
+// ─────────────────────────────────────────────────────────────────
 export default function ProjectDetail() {
   const { slug } = useParams();
   const { t } = useTranslation();
   const { lang } = useLang();
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({ name: '', phone: '', message: '' });
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Fetch fresh from Supabase every time slug changes
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
     setErrorMsg('');
+    setProject(null);
     projectsService.getProjectBySlug(slug)
       .then(data => {
         setProject(data);
@@ -41,8 +133,9 @@ export default function ProjectDetail() {
         setErrorMsg(lang === 'ar' ? 'عذراً، لم نتمكن من العثور على هذا المشروع.' : 'Sorry, project not found.');
         setLoading(false);
       });
-  }, [slug, lang]);
+  }, [slug]);
 
+  // ── Loading State ──
   if (loading) {
     return (
       <div className="min-h-screen pt-32 flex flex-col justify-center items-center bg-dark text-white">
@@ -54,15 +147,20 @@ export default function ProjectDetail() {
     );
   }
 
+  // ── Error / Not Found State ──
   if (errorMsg || !project) {
     return (
       <div className="min-h-screen pt-32 pb-16 flex flex-col justify-center items-center bg-dark text-white text-center px-4">
         <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center text-gold text-3xl mb-6">
           🏢
         </div>
-        <h2 className="text-3xl font-bold mb-4">{errorMsg || (lang === 'ar' ? 'المشروع غير موجود' : 'Project Not Found')}</h2>
+        <h2 className="text-3xl font-bold mb-4">
+          {errorMsg || (lang === 'ar' ? 'المشروع غير موجود' : 'Project Not Found')}
+        </h2>
         <p className="text-gray-400 max-w-md mb-8">
-          {lang === 'ar' ? 'ربما تم تغيير رابط المشروع أو نه منحه صلاحيات جديدة.' : 'The requested project link may have been updated.'}
+          {lang === 'ar'
+            ? 'ربما تم تغيير رابط المشروع أو إزالته.'
+            : 'The requested project may have been removed or its link changed.'}
         </p>
         <Link to="/projects" className="btn-gold px-8 py-3 rounded-sm font-semibold">
           {lang === 'ar' ? 'عرض جميع المشاريع' : 'Browse All Projects'}
@@ -71,101 +169,174 @@ export default function ProjectDetail() {
     );
   }
 
-  const title = (lang === 'ar' ? project.title_ar : project.title_en) || project.title_ar || project.title_en || '';
-  const location = (lang === 'ar' ? project.location_ar : project.location_en) || project.location_ar || project.location_en || '';
-  const address = (lang === 'ar' ? project.address_ar : project.address_en) || location;
+  // ─────────────────────────────────────────────────────────────────
+  // All data comes from Supabase — NO hardcoded values
+  // ─────────────────────────────────────────────────────────────────
+  const title       = (lang === 'ar' ? project.title_ar : project.title_en) || project.title_ar || project.title_en || '';
+  const location    = (lang === 'ar' ? project.location_ar : project.location_en) || project.location_ar || project.location_en || '';
+  const address     = (lang === 'ar' ? project.address_ar : project.address_en) || address || '';
   const description = (lang === 'ar' ? project.description_ar : project.description_en) || project.description_ar || project.description_en || '';
 
-  const sendToWhatsApp = () => {
-    const msg = encodeURIComponent(
-      `مرحباً، أود الاستفسار عن مشروع: ${title}\nالموقع: ${location}\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالرسالة: ${form.message}`
-    );
-    window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank');
-  };
+  // Location display: prefer location_name, then bilingual, then address
+  const locationDisplay = project.location_name || location || address || '';
 
-  const statusColors: Record<string, string> = {
-    completed: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
-    under_construction: 'bg-gold/20 text-gold border-gold/40',
-    upcoming: 'bg-blue-500/20 text-blue-400 border-blue-500/40',
-    sold_out: 'bg-red-500/20 text-red-400 border-red-500/40',
-    planning: 'bg-purple-500/20 text-purple-400 border-purple-500/40',
-  };
+  // Status
+  const statusLabel = STATUS_LABELS[project.status]?.[lang === 'ar' ? 'ar' : 'en'] || project.status;
+  const statusColor = STATUS_COLORS[project.status] || 'bg-gold/20 text-gold border-gold/40';
 
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, { ar: string; en: string }> = {
-      completed: { ar: 'مكتمل والمبنى جاهز', en: 'Completed' },
-      under_construction: { ar: 'قيد الإنشاء والتطوير', en: 'Under Construction' },
-      upcoming: { ar: 'مشروع قادم قريباً', en: 'Upcoming' },
-      sold_out: { ar: 'تم البيع بالكامل', en: 'Sold Out' },
-      planning: { ar: 'في مرحلة التخطيط', en: 'In Planning' },
-    };
-    return labels[status]?.[lang === 'ar' ? 'ar' : 'en'] || status;
-  };
+  // Category
+  const categoryLabel = CATEGORY_LABELS[project.category]?.[lang === 'ar' ? 'ar' : 'en'] || project.category;
 
-  const images = (project as any).project_images?.length > 0
-    ? (project as any).project_images.map((img: any) => img.image_url)
-    : [project.cover_image || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80'];
+  // Gallery images: project_images table OR cover_image
+  const galleryImages: string[] = (() => {
+    const fromRelation = (project as any).project_images;
+    if (Array.isArray(fromRelation) && fromRelation.length > 0) {
+      return fromRelation.map((img: any) => img.image_url).filter(Boolean);
+    }
+    if (project.cover_image) return [project.cover_image];
+    return [];
+  })();
 
+  // Features array
   const featuresList: string[] = Array.isArray(project.features)
     ? project.features
     : typeof project.features === 'string'
     ? (project.features as string).split(',').map(s => s.trim()).filter(Boolean)
     : [];
 
+  // Map
+  const mapEmbedUrl = buildMapEmbedUrl(project, locationDisplay);
+  const mapsOpenUrl = buildMapsOpenUrl(project, locationDisplay);
+
+  // WhatsApp inquiry
+  const sendToWhatsApp = () => {
+    const msg = encodeURIComponent(
+      `مرحباً، أود الاستفسار عن مشروع: ${title}\nالموقع: ${locationDisplay}\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالرسالة: ${form.message}`
+    );
+    window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank');
+  };
+
+  // Sidebar spec items — all from Supabase
+  const specItems = [
+    {
+      icon: '📍',
+      label: lang === 'ar' ? 'الموقع' : 'Location',
+      value: locationDisplay || null,
+    },
+    {
+      icon: '🏢',
+      label: lang === 'ar' ? 'العنوان التفصيلي' : 'Detailed Address',
+      value: address || null,
+    },
+    {
+      icon: '🏗️',
+      label: lang === 'ar' ? 'التصنيف' : 'Category',
+      value: categoryLabel,
+    },
+    {
+      icon: '✅',
+      label: lang === 'ar' ? 'حالة المشروع' : 'Status',
+      value: statusLabel,
+    },
+    {
+      icon: '📐',
+      label: lang === 'ar' ? 'المساحة الإجمالية' : 'Total Area',
+      value: project.area ? `${project.area} م²` : null,
+    },
+    {
+      icon: '🔑',
+      label: lang === 'ar' ? 'عدد الوحدات' : 'Total Units',
+      value: project.units ? `${project.units} ${lang === 'ar' ? 'وحدة' : 'units'}` : null,
+    },
+    {
+      icon: '📅',
+      label: lang === 'ar' ? 'سنة / تاريخ المشروع' : 'Project Year',
+      value: project.year || null,
+    },
+    {
+      icon: '🚀',
+      label: lang === 'ar' ? 'تاريخ البدء' : 'Start Date',
+      value: formatDate(project.start_date, lang),
+    },
+    {
+      icon: '🏁',
+      label: lang === 'ar' ? 'موعد التسليم المتوقع' : 'Expected Completion',
+      value: formatDate(project.completion_date, lang),
+    },
+  ].filter(item => item.value);
+
   return (
     <>
-      <SEO 
-        title={title}
-        description={description ? description.slice(0, 160) : title}
+      <SEO
+        title={project.seo_title || title}
+        description={project.seo_description || (description ? description.slice(0, 160) : title)}
         image={project.cover_image}
       />
 
-      {/* Hero Gallery with Swiper */}
+      {/* ── Hero Gallery ── */}
       <div className="relative h-[75vh] min-h-[500px] overflow-hidden bg-dark">
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay, EffectFade]}
-          effect="fade"
-          navigation
-          pagination={{ clickable: true }}
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-          loop={images.length > 1}
-          className="w-full h-full"
-        >
-          {images.map((img: string, i: number) => (
-            <SwiperSlide key={i}>
-              <div className="relative w-full h-full">
-                <img src={img} alt={`${title} - ${i + 1}`} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/50 to-transparent" />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {galleryImages.length > 0 ? (
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay, EffectFade]}
+            effect="fade"
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            loop={galleryImages.length > 1}
+            className="w-full h-full"
+          >
+            {galleryImages.map((img, i) => (
+              <SwiperSlide key={i}>
+                <div className="relative w-full h-full">
+                  <img src={img} alt={`${title} - ${i + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/50 to-transparent" />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          <div className="w-full h-full bg-dark-300 flex items-center justify-center">
+            <span className="text-8xl opacity-30">🏗️</span>
+          </div>
+        )}
 
+        {/* Hero Overlay — Title & Status */}
         <div className="absolute bottom-12 left-0 right-0 z-20 pointer-events-none">
           <div className="container-custom">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
               <div className="flex flex-wrap items-center gap-3 mb-4 pointer-events-auto">
-                <span className={`px-4 py-1.5 text-xs font-semibold border rounded-full backdrop-blur-md ${statusColors[project.status] || 'bg-gold/20 text-gold border-gold/40'}`}>
-                  {getStatusLabel(project.status)}
+                {/* Status badge — dynamic from DB */}
+                <span className={`px-4 py-1.5 text-xs font-semibold border rounded-full backdrop-blur-md ${statusColor}`}>
+                  {statusLabel}
                 </span>
-                <span className="text-gray-300 text-sm flex items-center gap-1.5 bg-dark-200/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                  <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  </svg>
-                  {location}
+                {/* Category badge — dynamic from DB */}
+                <span className="text-gray-300 text-xs font-medium bg-dark-200/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                  {categoryLabel}
                 </span>
+                {/* Location badge — dynamic from DB */}
+                {locationDisplay && (
+                  <span className="text-gray-300 text-sm flex items-center gap-1.5 bg-dark-200/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                    <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {locationDisplay}
+                  </span>
+                )}
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg tracking-tight font-arabic">{title}</h1>
+              <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg tracking-tight font-arabic">
+                {title}
+              </h1>
             </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Sticky Breadcrumb Navigation */}
+      {/* ── Sticky Breadcrumb ── */}
       <div className="bg-dark-100/90 border-b border-white/10 py-4 sticky top-16 lg:top-20 z-40 backdrop-blur-md">
         <div className="container-custom flex items-center justify-between gap-4 text-sm text-gray-400">
           <div className="flex items-center gap-2 truncate">
@@ -175,41 +346,46 @@ export default function ProjectDetail() {
             <span>/</span>
             <span className="text-gold font-medium truncate">{title}</span>
           </div>
-
           <button
             onClick={sendToWhatsApp}
             className="hidden sm:flex items-center gap-2 text-xs font-semibold px-4 py-2 bg-[#25D366] hover:bg-[#20ba58] text-white rounded-full transition-all"
           >
-            <span>{lang === 'ar' ? 'استفسار عبر واتساب' : 'WhatsApp Inquiry'}</span>
+            {lang === 'ar' ? 'استفسار عبر واتساب' : 'WhatsApp Inquiry'}
           </button>
         </div>
       </div>
 
+      {/* ── Main Content ── */}
       <section className="section-padding bg-dark relative z-10">
         <div className="container-custom">
           <div className="grid lg:grid-cols-3 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-12">
-              
-              {/* Overview / Description */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="card-luxury p-8"
-              >
-                <h2 className="text-2xl font-bold text-white mb-3">
-                  {lang === 'ar' ? 'نبذة عن المشروع' : 'Project Overview'}
-                </h2>
-                <div className="gold-divider mb-6" />
-                <p className="text-gray-300 leading-relaxed text-lg whitespace-pre-line font-arabic">{description}</p>
-              </motion.div>
 
-              {/* Progress Bar (If Construction) */}
-              {project.status === 'under_construction' && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} 
-                  whileInView={{ opacity: 1, y: 0 }} 
+            {/* ── Left Column: Main Content ── */}
+            <div className="lg:col-span-2 space-y-12">
+
+              {/* Project Overview / Description */}
+              {description && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="card-luxury p-8"
+                >
+                  <h2 className="text-2xl font-bold text-white mb-3">
+                    {lang === 'ar' ? 'نبذة عن المشروع' : 'Project Overview'}
+                  </h2>
+                  <div className="gold-divider mb-6" />
+                  <p className="text-gray-300 leading-relaxed text-lg whitespace-pre-line font-arabic">
+                    {description}
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Progress Bar — always show if progress > 0, not just under_construction */}
+              {project.progress != null && project.progress > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                 >
                   <div className="card-luxury p-8 border-gold/30">
@@ -218,19 +394,24 @@ export default function ProjectDetail() {
                       <span className="text-gold font-bold text-3xl font-english">{project.progress}%</span>
                     </h3>
                     <div className="w-full bg-dark-300 rounded-full h-3 overflow-hidden border border-white/10 p-0.5">
-                      <motion.div 
-                        className="bg-gradient-to-r from-gold/80 to-gold h-full rounded-full" 
+                      <motion.div
+                        className="bg-gradient-to-r from-gold/80 to-gold h-full rounded-full"
                         initial={{ width: 0 }}
                         whileInView={{ width: `${project.progress}%` }}
-                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        transition={{ duration: 1.5, ease: 'easeOut' }}
                         viewport={{ once: true }}
                       />
                     </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      {lang === 'ar'
+                        ? `تم إنجاز ${project.progress}% من المشروع حتى الآن`
+                        : `${project.progress}% of the project has been completed`}
+                    </p>
                   </div>
                 </motion.div>
               )}
 
-              {/* Price Range (if defined) */}
+              {/* Price Range */}
               {(project.price_from || project.price_to) && (
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <div className="card-luxury p-8 border-gold/20 flex flex-wrap items-center justify-between gap-4">
@@ -239,8 +420,12 @@ export default function ProjectDetail() {
                         {lang === 'ar' ? 'نطاق الأسعار' : 'Price Range'}
                       </p>
                       <p className="text-2xl font-bold text-gold font-english">
-                        {project.price_from ? `${project.price_from.toLocaleString()} ${t('common.sar')}` : ''} 
-                        {project.price_to ? ` - ${project.price_to.toLocaleString()} ${t('common.sar')}` : ''}
+                        {project.price_from
+                          ? `${project.price_from.toLocaleString()} ${t('common.sar')}`
+                          : ''}
+                        {project.price_to
+                          ? ` – ${project.price_to.toLocaleString()} ${t('common.sar')}`
+                          : ''}
                       </p>
                     </div>
                     <button
@@ -261,7 +446,7 @@ export default function ProjectDetail() {
                   </h3>
                   <div className="gold-divider mb-6" />
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {featuresList.map((feat: string, idx: number) => (
+                    {featuresList.map((feat, idx) => (
                       <div key={idx} className="flex items-center gap-4 p-4 card-luxury border border-white/5 hover:border-gold/30 transition-colors">
                         <div className="w-9 h-9 bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0">
                           <svg className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 20 20">
@@ -275,7 +460,7 @@ export default function ProjectDetail() {
                 </motion.div>
               )}
 
-              {/* Video Showcase (if video_url exists) */}
+              {/* Video Showcase */}
               {project.video_url && (
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <h3 className="text-2xl font-bold text-white mb-3">
@@ -293,48 +478,74 @@ export default function ProjectDetail() {
                 </motion.div>
               )}
 
-              {/* Interactive Embedded Google Map */}
+              {/* ── Project Location Map ── */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-2xl font-bold text-white">
-                    {lang === 'ar' ? 'موقع المشروع على الخريطة' : 'Project Location Map'}
-                  </h3>
-                  {project.google_maps_url && (
-                    <a
-                      href={project.google_maps_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-gold hover:underline flex items-center gap-1 font-semibold"
-                    >
-                      {lang === 'ar' ? 'فتح الملاحة في خرائط جوجل' : 'Open in Google Maps'} ↗
-                    </a>
-                  )}
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">
+                      {lang === 'ar' ? 'موقع المشروع' : 'Project Location'}
+                    </h3>
+                    {locationDisplay && (
+                      <p className="text-gray-400 text-sm mt-1 flex items-center gap-1">
+                        <svg className="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        </svg>
+                        {locationDisplay}
+                      </p>
+                    )}
+                  </div>
+                  {/* Open in Google Maps button */}
+                  <a
+                    href={mapsOpenUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs font-semibold px-4 py-2.5 bg-gold/10 hover:bg-gold/20 text-gold border border-gold/30 rounded-lg transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                    </svg>
+                    {lang === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
+                  </a>
                 </div>
-                <div className="gold-divider mb-6" />
-                <div className="h-96 overflow-hidden rounded-sm border border-white/10 shadow-2xl relative bg-dark-300">
-                  <iframe
-                    src={
-                      project.map_embed_url && project.map_embed_url.includes('http')
-                        ? project.map_embed_url
-                        : `https://maps.google.com/maps?q=${encodeURIComponent(project.google_maps_url || address || location || title)}&t=&z=14&ie=UTF8&iwloc=&output=embed`
-                    }
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Project Location Map"
-                  />
-                </div>
+                <div className="gold-divider mb-4" />
+
+                {mapEmbedUrl ? (
+                  <div className="h-96 overflow-hidden rounded-sm border border-white/10 shadow-2xl relative bg-dark-300">
+                    <iframe
+                      src={mapEmbedUrl}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`${title} — Project Location Map`}
+                    />
+                  </div>
+                ) : (
+                  // No location data available
+                  <div className="h-48 rounded-sm border border-white/10 bg-dark-300 flex flex-col items-center justify-center gap-3 text-gray-500">
+                    <svg className="w-10 h-10 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <p className="text-sm">
+                      {lang === 'ar' ? 'الموقع غير متاح حالياً' : 'Location not available'}
+                    </p>
+                  </div>
+                )}
+
+                {/* Coordinate indicator if coordinates are set */}
+                {project.latitude && project.longitude && (
+                  <p className="text-xs text-gray-500 mt-2 text-center font-mono">
+                    {project.latitude.toFixed(6)}, {project.longitude.toFixed(6)}
+                  </p>
+                )}
               </motion.div>
             </div>
 
-            {/* Sidebar Details */}
+            {/* ── Right Sidebar ── */}
             <div className="space-y-8">
-              
-              {/* Project Info Card */}
-              <motion.div 
+              <motion.div
                 className="card-luxury p-8 sticky top-32 border-gold/30"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -344,36 +555,30 @@ export default function ProjectDetail() {
                   {lang === 'ar' ? 'تفاصيل المشروع' : 'Project Specifications'}
                 </h3>
 
-                <div className="space-y-6">
-                  {[
-                    { label: lang === 'ar' ? 'الموقع' : 'Location', value: location, icon: '📍' },
-                    { label: lang === 'ar' ? 'العنوان' : 'Address', value: address, icon: '🏢' },
-                    { label: lang === 'ar' ? 'المساحة الإجمالية' : 'Total Area', value: project.area ? `${project.area} م²` : null, icon: '📐' },
-                    { label: lang === 'ar' ? 'سنة التسليم / الإنشاء' : 'Year', value: project.year, icon: '📅' },
-                    { label: lang === 'ar' ? 'عدد الوحدات' : 'Total Units', value: project.units ? `${project.units} وحدة` : null, icon: '🔑' },
-                    { label: lang === 'ar' ? 'حالة المشروع' : 'Status', value: getStatusLabel(project.status), icon: '✅' },
-                  ]
-                    .filter(item => item.value)
-                    .map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-4">
-                        <div className="w-9 h-9 rounded-full bg-dark-300 border border-white/10 flex items-center justify-center text-base flex-shrink-0">
-                          {item.icon}
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400 mb-1">{item.label}</p>
-                          <p className="text-white font-semibold text-sm">{item.value}</p>
-                        </div>
+                {/* Spec Items — all from DB */}
+                <div className="space-y-5">
+                  {specItems.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-4">
+                      <div className="w-9 h-9 rounded-full bg-dark-300 border border-white/10 flex items-center justify-center text-base flex-shrink-0">
+                        {item.icon}
                       </div>
-                    ))}
+                      <div>
+                        <p className="text-xs text-gray-400 mb-0.5">{item.label}</p>
+                        <p className="text-white font-semibold text-sm">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Consultation Inquiry Form */}
+                {/* WhatsApp Inquiry Form */}
                 <div className="mt-8 pt-6 border-t border-white/10">
-                  <h4 className="font-bold text-white mb-3 text-sm">
+                  <h4 className="font-bold text-white mb-1 text-sm">
                     {lang === 'ar' ? 'هل تود الاستفسار عن هذا المشروع؟' : 'Interested in this project?'}
                   </h4>
                   <p className="text-gray-400 text-xs mb-4">
-                    {lang === 'ar' ? 'تواصل مباشرة مع استشاري المبيعات للحصول على التفاصيل' : 'Contact our sales consultant directly for details.'}
+                    {lang === 'ar'
+                      ? 'تواصل مباشرة مع استشاري المبيعات للحصول على التفاصيل'
+                      : 'Contact our sales consultant directly for details.'}
                   </p>
                   <div className="space-y-3">
                     <input
@@ -410,6 +615,7 @@ export default function ProjectDetail() {
                 </div>
               </motion.div>
             </div>
+
           </div>
         </div>
       </section>

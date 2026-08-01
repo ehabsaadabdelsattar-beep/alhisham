@@ -82,7 +82,7 @@ export default function AIChat() {
     date.toLocaleTimeString(lang === 'ar' ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="ai-chat-float">
+    <div className="fixed bottom-24 ltr:right-6 rtl:left-6 z-50">
       {/* Chat Window */}
       {isOpen && (
         <div className="absolute bottom-20 ltr:right-0 rtl:left-0 w-80 sm:w-96 bg-white dark:bg-dark-100 rounded-2xl shadow-luxury-dark border border-gray-100 dark:border-dark-300 overflow-hidden animate-slide-up">

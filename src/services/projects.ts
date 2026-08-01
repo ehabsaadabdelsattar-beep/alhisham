@@ -62,7 +62,7 @@ export const projectsService = {
   async getProjectBySlug(slug: string) {
     const { data, error } = await supabase
       .from('projects')
-      .select('*, project_images(*), project_features(*), project_units(*), project_updates(*)')
+      .select('*, project_images(*), project_updates(*)')
       .eq('slug', slug)
       .single();
 

@@ -352,13 +352,13 @@ export default function ProjectDetail() {
         project_name: title || null,
         message: contactForm.message || undefined,
       });
-      whatsAppMsg(contactForm.name, contactForm.phone);
       setContactForm(prev => ({ ...prev, submitted: true }));
     } catch (err: any) {
       console.error('Inquiry submit error:', err);
-      // Still send WhatsApp even if DB save fails
-      whatsAppMsg(contactForm.name, contactForm.phone);
-      setContactForm(prev => ({ ...prev, submitted: true }));
+      setContactForm(prev => ({
+        ...prev,
+        error: isRtl ? 'عذراً، حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.' : 'Sorry, failed to send request. Please try again.',
+      }));
     } finally {
       setContactSubmitting(false);
     }

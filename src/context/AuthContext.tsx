@@ -82,7 +82,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
-        // Fallback synthetic profile if row or table doesn't exist yet
+        console.warn('Profile fetch notice:', error.message);
+        // Do NOT use upsert here as it overwrites existing role to customer if fetch fails temporarily
         const fallbackProfile: Profile = {
           id: currentUser.id,
           role: 'customer',
@@ -95,11 +96,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         setProfile(fallbackProfile);
 
-        // Attempt silent upsert if table exists
         try {
-          await supabase.from('profiles').upsert(fallbackProfile, { onConflict: 'id' });
+          // Safe insert: only inserts if row doesn't exist, never overwrites
+          await supabase.from('profiles').insert([{
+            id: currentUser.id,
+            role: 'customer',
+            full_name: fallbackProfile.full_name,
+            email: fallbackProfile.email,
+            phone: fallbackProfile.phone,
+          }]);
         } catch {
-          // Table might not exist yet; safe fallback
+          // Ignore if row already exists
         }
         return;
       }

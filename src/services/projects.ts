@@ -60,23 +60,54 @@ export const projectsService = {
   },
 
   async getProjectBySlug(slug: string) {
+    // 1. Fetch main project row first (by slug or id)
     let { data, error } = await supabase
       .from('projects')
-      .select('*, project_images(*), project_updates(*)')
+      .select('*')
       .eq('slug', slug)
       .maybeSingle();
 
     if (!data) {
       const { data: dataById } = await supabase
         .from('projects')
-        .select('*, project_images(*), project_updates(*)')
+        .select('*')
         .eq('id', slug)
         .maybeSingle();
 
       if (dataById) data = dataById;
     }
 
-    if (!data) throw new Error('Project not found');
+    if (!data) {
+      console.error('Project query error or not found:', error);
+      throw new Error('Project not found');
+    }
+
+    // 2. Safely fetch associated images without breaking if table/relation is empty
+    try {
+      const { data: images } = await supabase
+        .from('project_images')
+        .select('*')
+        .eq('project_id', data.id)
+        .order('display_order', { ascending: true });
+
+      data.project_images = images || [];
+    } catch {
+      data.project_images = [];
+    }
+
+    // 3. Safely fetch updates
+    try {
+      const { data: updates } = await supabase
+        .from('project_updates')
+        .select('*')
+        .eq('project_id', data.id)
+        .order('created_at', { ascending: false });
+
+      data.project_updates = updates || [];
+    } catch {
+      data.project_updates = [];
+    }
+
     return data;
   },
 

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import { useLang } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { getRoleLabel } from '../../lib/permissions';
 import {
   FiSun, FiMoon, FiUser, FiLogOut, FiSettings,
   FiChevronDown, FiX, FiShield, FiBarChart2, FiGlobe
@@ -55,7 +56,7 @@ export default function Navbar() {
   const megaRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const { session, profile, loading, signOut } = useAuth();
+  const { session, profile, loading, signOut, canAccessAdmin } = useAuth();
   const isLoggedIn = !!session;
 
   const navLinks = [
@@ -128,7 +129,7 @@ export default function Navbar() {
   };
 
   const roleLabel: Record<string, string> = {
-    admin: lang === 'ar' ? 'مدير النظام' : 'Admin',
+    admin: 'Super Admin',
     editor: lang === 'ar' ? 'محرر' : 'Editor',
     investor: lang === 'ar' ? 'مستثمر' : 'Investor',
     customer: lang === 'ar' ? 'عميل' : 'Customer',
@@ -275,7 +276,7 @@ export default function Navbar() {
                           </div>
                         </div>
                         <span className="mt-2 inline-block text-[10px] uppercase tracking-wider px-2 py-0.5 bg-gold/15 text-gold border border-gold/30 font-semibold">
-                          {roleLabel[profile.role] || profile.role}
+                          {roleLabel[profile.role] || getRoleLabel(profile.role, lang === 'ar' ? 'ar' : 'en')}
                         </span>
                       </div>
 
@@ -286,7 +287,7 @@ export default function Navbar() {
                         >
                           <FiUser className="w-4 h-4 text-gold" /> {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
                         </Link>
-                        {(profile.role === 'admin' || profile.role === 'editor') && (
+                        {canAccessAdmin && (
                           <Link
                             to="/admin"
                             className="flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors font-bold text-gold"
@@ -494,7 +495,7 @@ export default function Navbar() {
                     </div>
                   </div>
                   <span className="mt-2 inline-block text-[10px] uppercase tracking-wider px-2 py-0.5 bg-gold/20 text-gold border border-gold/40">
-                    {roleLabel[profile.role] || profile.role}
+                    {roleLabel[profile.role] || getRoleLabel(profile.role, lang === 'ar' ? 'ar' : 'en')}
                   </span>
                 </div>
               )}
@@ -521,7 +522,7 @@ export default function Navbar() {
                     <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest text-white hover:text-gold">
                       <FiUser className="w-4 h-4 text-gold" /> Profile
                     </Link>
-                    {(profile.role === 'admin' || profile.role === 'editor') && (
+                    {canAccessAdmin && (
                       <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest text-gold font-bold">
                         <FiShield className="w-4 h-4" /> Admin Dashboard
                       </Link>

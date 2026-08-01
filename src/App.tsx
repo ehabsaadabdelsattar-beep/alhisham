@@ -40,6 +40,8 @@ const AdminRequests = lazy(() => import('./pages/admin/AdminRequests'));
 const AdminTransactions = lazy(() => import('./pages/admin/AdminTransactions'));
 const AdminExpenses = lazy(() => import('./pages/admin/AdminExpenses'));
 const AdminCRM = lazy(() => import('./pages/admin/AdminCRM'));
+const AdminRoles = lazy(() => import('./pages/admin/AdminRoles'));
+const AdminPermissions = lazy(() => import('./pages/admin/AdminPermissions'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-dark">
@@ -80,14 +82,16 @@ function AnimatedRoutes() {
                 <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
               </Route>
               
-              {/* Admin Routes */}
-              <Route element={<ProtectedRoute allowedRoles={['admin', 'editor']} />}>
+              {/* Admin Routes — staff access; page-level permissions apply inside */}
+              <Route element={<ProtectedRoute allowedRoles={['admin', 'editor']} requireStaff />}>
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="projects" element={<AdminProjects />} />
                   <Route path="projects/new" element={<AdminProjectForm />} />
                   <Route path="projects/edit/:id" element={<AdminProjectForm />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="roles" element={<AdminRoles />} />
+                  <Route path="permissions" element={<AdminPermissions />} />
                   <Route path="requests" element={<AdminRequests />} />
                   <Route path="transactions" element={<AdminTransactions />} />
                   <Route path="expenses" element={<AdminExpenses />} />

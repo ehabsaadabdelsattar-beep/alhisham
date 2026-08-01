@@ -32,7 +32,7 @@ export default function Login() {
       const from = (location.state as any)?.from?.pathname;
       if (from && from !== '/login') {
         navigate(from, { replace: true });
-      } else if (profile?.role === 'admin' || profile?.role === 'editor') {
+      } else if (profile?.role === 'admin' || profile?.role === 'editor' || profile?.is_staff) {
         navigate('/admin', { replace: true });
       } else {
         navigate('/', { replace: true });

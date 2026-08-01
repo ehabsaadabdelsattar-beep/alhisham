@@ -18,8 +18,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default function AdminExpenses() {
-  const { profile } = useAuth();
-  const isAdmin = profile?.role === 'admin';
+  const { profile, hasPermission } = useAuth();
+  const isAdmin = profile?.role === 'admin' || hasPermission('finance.view');
+  const canCreateFinance = profile?.role === 'admin' || hasPermission('finance.create');
+  void canCreateFinance;
 
   // State
   const [expenses, setExpenses] = useState<Expense[]>([]);

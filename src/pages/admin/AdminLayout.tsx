@@ -1,26 +1,39 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getRoleLabel } from '../../lib/permissions';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../../components/ui/SEO';
 import {
   FiHome, FiBox, FiFileText, FiImage, FiUsers,
-  FiMessageSquare, FiInbox, FiSettings, FiLogOut, FiActivity,
-  FiExternalLink, FiMenu, FiX, FiGlobe, FiDollarSign, FiCreditCard, FiTarget
+  FiInbox, FiSettings, FiLogOut, FiActivity,
+  FiExternalLink, FiMenu, FiX, FiGlobe, FiDollarSign, FiCreditCard, FiTarget,
+  FiShield, FiKey
 } from 'react-icons/fi';
 
-const baseNavItems = [
-  { name: 'الرئيسية', path: '/admin', icon: FiHome, exact: true },
-  { name: 'المشاريع', path: '/admin/projects', icon: FiBox },
-  { name: 'المقالات', path: '/admin/articles', icon: FiFileText },
-  { name: 'مكتبة الوسائط', path: '/admin/media', icon: FiImage },
-  { name: 'المستخدمون', path: '/admin/users', icon: FiUsers },
-  { name: 'الطلبات', path: '/admin/requests', icon: FiInbox },
-  { name: 'إدارة العملاء (CRM)', path: '/admin/crm', icon: FiTarget },
-  { name: 'المعاملات المالية', path: '/admin/transactions', icon: FiDollarSign, adminOnly: true },
-  { name: 'المصروفات', path: '/admin/expenses', icon: FiCreditCard, adminOnly: true },
-  { name: 'سجل النشاطات', path: '/admin/logs', icon: FiActivity, adminOnly: true },
-  { name: 'الإعدادات', path: '/admin/settings', icon: FiSettings, adminOnly: true },
+type NavItem = {
+  name: string;
+  path: string;
+  icon: React.ComponentType<{ className?: string }>;
+  exact?: boolean;
+  permission?: string;
+  adminOnly?: boolean;
+};
+
+const baseNavItems: NavItem[] = [
+  { name: 'الرئيسية', path: '/admin', icon: FiHome, exact: true, permission: 'analytics.view' },
+  { name: 'المشاريع', path: '/admin/projects', icon: FiBox, permission: 'projects.view' },
+  { name: 'المقالات', path: '/admin/articles', icon: FiFileText, permission: 'content.view' },
+  { name: 'مكتبة الوسائط', path: '/admin/media', icon: FiImage, permission: 'projects.manage_images' },
+  { name: 'المستخدمون', path: '/admin/users', icon: FiUsers, permission: 'users.view' },
+  { name: 'الأدوار', path: '/admin/roles', icon: FiShield, permission: 'users.manage_permissions' },
+  { name: 'الصلاحيات', path: '/admin/permissions', icon: FiKey, permission: 'users.manage_permissions' },
+  { name: 'الطلبات', path: '/admin/requests', icon: FiInbox, permission: 'crm.view' },
+  { name: 'إدارة العملاء (CRM)', path: '/admin/crm', icon: FiTarget, permission: 'crm.view' },
+  { name: 'المعاملات المالية', path: '/admin/transactions', icon: FiDollarSign, permission: 'finance.view' },
+  { name: 'المصروفات', path: '/admin/expenses', icon: FiCreditCard, permission: 'finance.view' },
+  { name: 'سجل النشاطات', path: '/admin/logs', icon: FiActivity, permission: 'audit.view' },
+  { name: 'الإعدادات', path: '/admin/settings', icon: FiSettings, permission: 'settings.view' },
 ];
 
 function getInitials(name: string | null): string {
@@ -29,7 +42,7 @@ function getInitials(name: string | null): string {
 }
 
 export default function AdminLayout() {
-  const { signOut, profile } = useAuth();
+  const { signOut, profile, hasPermission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -43,13 +56,18 @@ export default function AdminLayout() {
     exact ? location.pathname === path : (location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path)));
 
   const navItems = baseNavItems.filter(item => {
-    if (item.adminOnly && profile?.role !== 'admin') return false;
-    return true;
+    if (profile?.role === 'admin') return true;
+    if (item.adminOnly) return false;
+    if (item.permission) return hasPermission(item.permission);
+    // Legacy editor: show core items without explicit permission match
+    if (profile?.role === 'editor') {
+      return ['/admin', '/admin/projects', '/admin/articles', '/admin/media', '/admin/requests', '/admin/crm'].includes(item.path);
+    }
+    return false;
   });
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      {/* Brand */}
       <div className="flex items-center justify-between h-16 px-5 border-b border-gray-800/50 flex-shrink-0">
         <Link to="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
           <img src="/logo.png" alt="AL HISHAM" className="h-8 w-auto object-contain brightness-0 invert" />
@@ -62,7 +80,6 @@ export default function AdminLayout() {
         </button>
       </div>
 
-      {/* Profile */}
       <div className="px-4 py-4 border-b border-gray-800/50">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/80 to-yellow-600 flex items-center justify-center text-dark font-bold text-sm flex-shrink-0">
@@ -78,11 +95,10 @@ export default function AdminLayout() {
           </div>
         </div>
         <span className="mt-2 inline-block px-2 py-0.5 rounded-full text-xs bg-gold/20 text-gold border border-gold/30">
-          {profile?.role === 'admin' ? 'مدير النظام' : profile?.role === 'editor' ? 'محرر' : profile?.role}
+          {getRoleLabel(profile?.role || '', 'ar')}
         </span>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
         {navItems.map(item => {
           const active = isActive(item.path, item.exact);
@@ -105,7 +121,6 @@ export default function AdminLayout() {
         })}
       </nav>
 
-      {/* Bottom Actions */}
       <div className="px-3 py-4 border-t border-gray-800/50 space-y-1 flex-shrink-0">
         <a
           href="/"
@@ -137,8 +152,6 @@ export default function AdminLayout() {
       />
 
       <div className="flex h-screen bg-gray-50 dark:bg-[#111] overflow-hidden" dir="rtl">
-
-        {/* Mobile Sidebar Backdrop */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
@@ -151,12 +164,10 @@ export default function AdminLayout() {
           )}
         </AnimatePresence>
 
-        {/* Desktop Sidebar */}
         <aside className="hidden lg:flex w-60 bg-[#0f0f0f] border-l border-gray-800/50 flex-col flex-shrink-0">
           <SidebarContent />
         </aside>
 
-        {/* Mobile Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.aside
@@ -171,10 +182,7 @@ export default function AdminLayout() {
           )}
         </AnimatePresence>
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
-          {/* Top bar */}
           <header className="h-16 bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
             <div className="flex items-center gap-3">
               <button
@@ -209,7 +217,6 @@ export default function AdminLayout() {
             </div>
           </header>
 
-          {/* Page content */}
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <Outlet />
           </main>

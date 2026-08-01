@@ -6,7 +6,9 @@ create table public.profiles (
   id uuid references auth.users on delete cascade not null primary key,
   role text not null check (role in ('admin', 'editor', 'investor', 'customer')) default 'customer',
   full_name text,
+  email text,
   phone text,
+  avatar_url text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -261,11 +263,22 @@ create policy "Admins can delete media images."
   using ( bucket_id = 'media' and exists (select 1 from public.profiles where id = auth.uid() and role = 'admin') );
 
 -- Trigger to automatically create profile on sign up
-create or replace function public.handle_new_user() 
+create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, role)
-  values (new.id, new.raw_user_meta_data->>'full_name', 'customer');
+  insert into public.profiles (id, full_name, email, phone, role)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    new.email,
+    new.raw_user_meta_data->>'phone',
+    'customer'
+  )
+  on conflict (id) do update
+  set
+    email = excluded.email,
+    full_name = coalesce(excluded.full_name, public.profiles.full_name),
+    phone = coalesce(excluded.phone, public.profiles.phone);
   return new;
 end;
 $$ language plpgsql security definer;

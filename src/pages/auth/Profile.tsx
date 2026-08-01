@@ -152,7 +152,7 @@ export default function Profile() {
   if (!profile) return null;
 
   const roleLabels: Record<string, string> = {
-    admin: lang === 'ar' ? 'مدير النظام' : 'Administrator',
+    admin: 'Super Admin',
     editor: lang === 'ar' ? 'محرر' : 'Editor',
     investor: lang === 'ar' ? 'مستثمر' : 'Investor',
     customer: lang === 'ar' ? 'عميل' : 'Customer',

@@ -27,8 +27,11 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default function AdminTransactions() {
-  const { profile } = useAuth();
-  const isAdmin = profile?.role === 'admin';
+  const { profile, hasPermission } = useAuth();
+  const isAdmin = profile?.role === 'admin' || hasPermission('finance.view');
+  const canCreateFinance = profile?.role === 'admin' || hasPermission('finance.create');
+  const canEditFinance = profile?.role === 'admin' || hasPermission('finance.edit');
+  void canCreateFinance; void canEditFinance;
 
   // State
   const [transactions, setTransactions] = useState<Transaction[]>([]);

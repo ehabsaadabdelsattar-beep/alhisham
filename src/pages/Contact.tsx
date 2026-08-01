@@ -2,26 +2,53 @@ import React, { useState } from 'react';
 import SEO from '../components/ui/SEO';
 import { useTranslation } from 'react-i18next';
 import { useLang } from '../context/LanguageContext';
+import { supabase } from '../lib/supabase';
 
 const WHATSAPP = '201103657888';
 
 export default function Contact() {
   const { t } = useTranslation();
+  const { isRTL } = useLang();
   const [form, setForm] = useState({ name: '', phone: '', email: '', subject: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const sendToWhatsApp = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const msg = encodeURIComponent(
-      `مرحباً، طلب تواصل من الموقع:\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالبريد: ${form.email}\nالموضوع: ${form.subject}\nالرسالة: ${form.message}`
-    );
-    window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank');
+    setSubmitting(true);
+    setError('');
+    try {
+      const { error: dbErr } = await supabase
+        .from('inquiries')
+        .insert([{
+          full_name: form.name,
+          phone: form.phone,
+          email: form.email || null,
+          message: `الموضوع: ${form.subject}\n\n${form.message}`,
+          status: 'new',
+          project_name: null,
+          project_id: null,
+        }]);
+
+      if (dbErr) throw dbErr;
+      setSubmitted(true);
+    } catch (err: any) {
+      console.error('Contact form error:', err);
+      setError(isRTL
+        ? 'عذراً، حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى أو التواصل معنا عبر واتساب.'
+        : 'Sorry, failed to send your message. Please try again or contact us via WhatsApp.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <>
-      <SEO 
-        title={t('nav.contact')} 
-        description="تواصل مع الهشام للتطوير العقاري للحصول على استشارة عقارية أو الاستفسار عن مشاريعنا." 
+      <SEO
+        title={t('nav.contact')}
+        description="تواصل مع الهشام للتطوير العقاري للحصول على استشارة عقارية أو الاستفسار عن مشاريعنا."
       />
 
       {/* Page Hero */}
@@ -54,18 +81,18 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-dark dark:text-white mb-1">{t('contact.address_title')}</h4>
-                     <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                       محور الأندلس، مدينة بني سويف، مصر
-                       <br/>
-                       <a 
-                         href="https://maps.app.goo.gl/A8wEG6SzoFYk36a4A" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="text-primary dark:text-gold hover:underline mt-1 inline-block text-xs"
-                       >
-                         عرض على خرائط Google ↗
-                       </a>
-                     </p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                      محور الأندلس، مدينة بني سويف، مصر
+                      <br />
+                      <a
+                        href="https://maps.app.goo.gl/A8wEG6SzoFYk36a4A"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary dark:text-gold hover:underline mt-1 inline-block text-xs"
+                      >
+                        عرض على خرائط Google ↗
+                      </a>
+                    </p>
                   </div>
                 </div>
 
@@ -75,7 +102,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-dark dark:text-white mb-1">{t('contact.phone_title')}</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm dir-ltr text-left">+20 110 365 7888</p>
+                    <a href={`tel:+${WHATSAPP}`} className="text-gray-500 dark:text-gray-400 text-sm dir-ltr hover:text-primary transition-colors">
+                      +20 110 365 7888
+                    </a>
                   </div>
                 </div>
 
@@ -88,6 +117,24 @@ export default function Contact() {
                     <p className="text-gray-500 dark:text-gray-400 text-sm">{t('contact.email_value')}</p>
                   </div>
                 </div>
+
+                {/* Direct WhatsApp link (separate from form) */}
+                <a
+                  href={`https://wa.me/${WHATSAPP}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-5 bg-[#25D366]/10 border border-[#25D366]/30 rounded-lg hover:bg-[#25D366]/20 transition-colors"
+                >
+                  <div className="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-bold text-dark dark:text-white text-sm">تواصل مباشر عبر واتساب</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">اضغط هنا للتحدث مع فريق المبيعات</p>
+                  </div>
+                </a>
               </div>
 
               {/* Social */}
@@ -109,63 +156,102 @@ export default function Contact() {
 
             {/* Form */}
             <div className="bg-white dark:bg-dark-300 p-8 shadow-luxury">
-              <h3 className="text-2xl font-bold text-dark dark:text-white mb-6">أرسل رسالة</h3>
-              <form onSubmit={sendToWhatsApp} className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.name')}</label>
-                    <input
-                      type="text"
-                      required
-                      value={form.name}
-                      onChange={e => setForm({...form, name: e.target.value})}
-                      className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors"
-                    />
+              {submitted ? (
+                <div className="flex flex-col items-center justify-center h-full text-center py-16">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                   </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.phone')}</label>
-                    <input
-                      type="tel"
-                      required
-                      value={form.phone}
-                      onChange={e => setForm({...form, phone: e.target.value})}
-                      className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors dir-ltr text-left"
-                    />
-                  </div>
+                  <h3 className="text-2xl font-bold text-dark dark:text-white mb-2">
+                    {isRTL ? 'تم إرسال رسالتك بنجاح!' : 'Message Sent!'}
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">
+                    {isRTL
+                      ? 'شكراً لتواصلك معنا. سيتواصل معك فريقنا في أقرب وقت.'
+                      : 'Thank you for reaching out. Our team will contact you soon.'}
+                  </p>
+                  <button
+                    onClick={() => { setSubmitted(false); setForm({ name: '', phone: '', email: '', subject: '', message: '' }); }}
+                    className="btn-primary"
+                  >
+                    {isRTL ? 'إرسال رسالة أخرى' : 'Send Another'}
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.email')}</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={e => setForm({...form, email: e.target.value})}
-                    className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.subject')}</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.subject}
-                    onChange={e => setForm({...form, subject: e.target.value})}
-                    className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.message')}</label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={form.message}
-                    onChange={e => setForm({...form, message: e.target.value})}
-                    className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors resize-none"
-                  ></textarea>
-                </div>
-                <button type="submit" className="btn-primary w-full justify-center mt-4">
-                  {t('contact.send_whatsapp')}
-                </button>
-              </form>
+              ) : (
+                <>
+                  <h3 className="text-2xl font-bold text-dark dark:text-white mb-6">أرسل رسالة</h3>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.name')}</label>
+                        <input
+                          type="text"
+                          required
+                          value={form.name}
+                          onChange={e => setForm({ ...form, name: e.target.value })}
+                          className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.phone')}</label>
+                        <input
+                          type="tel"
+                          required
+                          value={form.phone}
+                          onChange={e => setForm({ ...form, phone: e.target.value })}
+                          className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors dir-ltr text-left"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.email')}</label>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={e => setForm({ ...form, email: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.subject')}</label>
+                      <input
+                        type="text"
+                        required
+                        value={form.subject}
+                        onChange={e => setForm({ ...form, subject: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">{t('contact.message')}</label>
+                      <textarea
+                        required
+                        rows={4}
+                        value={form.message}
+                        onChange={e => setForm({ ...form, message: e.target.value })}
+                        className="w-full px-4 py-3 bg-surface dark:bg-dark-200 border border-gray-200 dark:border-dark-400 focus:border-primary focus:outline-none dark:text-white transition-colors resize-none"
+                      />
+                    </div>
+
+                    {error && (
+                      <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="btn-primary w-full justify-center mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {submitting
+                        ? (isRTL ? 'جاري الإرسال...' : 'Sending...')
+                        : (isRTL ? 'إرسال الرسالة' : 'Send Message')}
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -183,7 +269,7 @@ export default function Contact() {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             title="موقع شركة الهشام للتطوير العقاري"
-          ></iframe>
+          />
         </div>
         {/* Floating card over map */}
         <div className="absolute bottom-6 ltr:left-6 rtl:right-6 bg-white dark:bg-dark-200 shadow-luxury-dark p-5 max-w-xs">

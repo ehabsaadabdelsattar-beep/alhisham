@@ -1,245 +1,273 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { motion } from 'framer-motion';
+import { dashboardService, DashboardKPIs } from '../../services/dashboard';
+import { projectsService } from '../../services/projects';
+import type { Project } from '../../services/projects';
 import {
-  FiBox, FiUsers, FiFileText, FiMessageSquare, FiTrendingUp,
-  FiCheckCircle, FiClock, FiTool, FiExternalLink, FiPlus,
-  FiActivity, FiEye
+  FiActivity, FiTrendingUp, FiTrendingDown, FiBox, FiUsers,
+  FiMessageSquare, FiDollarSign, FiPieChart, FiCalendar,
+  FiArrowUpRight, FiEye, FiClock, FiCheckCircle, FiTool,
+  FiAlertCircle
 } from 'react-icons/fi';
 
-interface Stats {
-  totalProjects: number;
-  publishedProjects: number;
-  upcomingProjects: number;
-  underConstruction: number;
-  completedProjects: number;
-  totalUsers: number;
-  totalInvestors: number;
-  unreadMessages: number;
-}
-
-interface RecentProject {
-  id: string;
-  title_ar: string;
-  title_en: string;
-  status: string;
-  published: boolean;
-  cover_image?: string;
-  created_at: string;
-}
-
-const statusColors: Record<string, string> = {
-  completed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  under_construction: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  upcoming: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  sold_out: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  planning: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-};
-
-const statusLabels: Record<string, string> = {
-  completed: 'مكتمل',
-  under_construction: 'قيد التنفيذ',
-  upcoming: 'قريباً',
-  sold_out: 'مباع',
-  planning: 'تخطيط',
-};
-
-export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({
-    totalProjects: 0, publishedProjects: 0, upcomingProjects: 0,
-    underConstruction: 0, completedProjects: 0, totalUsers: 0,
-    totalInvestors: 0, unreadMessages: 0,
-  });
-  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchAll();
-  }, []);
-
-  const fetchAll = async () => {
-    try {
-      const [
-        totalP, publishedP, upcomingP, constructionP, completedP,
-        usersR, investorsR, messagesR, recentR
-      ] = await Promise.all([
-        supabase.from('projects').select('id', { count: 'exact', head: true }),
-        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('published', true),
-        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('status', 'upcoming'),
-        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('status', 'under_construction'),
-        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'investor'),
-        supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'unread'),
-        supabase.from('projects').select('id, title_ar, title_en, status, published, cover_image, created_at')
-          .order('created_at', { ascending: false }).limit(5),
-      ]);
-
-      setStats({
-        totalProjects: totalP.count || 0,
-        publishedProjects: publishedP.count || 0,
-        upcomingProjects: upcomingP.count || 0,
-        underConstruction: constructionP.count || 0,
-        completedProjects: completedP.count || 0,
-        totalUsers: usersR.count || 0,
-        totalInvestors: investorsR.count || 0,
-        unreadMessages: messagesR.count || 0,
-      });
-      setRecentProjects((recentR.data as RecentProject[]) || []);
-    } catch (err) {
-      console.error('Dashboard fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const statCards = [
-    { label: 'إجمالي المشاريع', value: stats.totalProjects, icon: FiBox, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/10' },
-    { label: 'مشاريع منشورة', value: stats.publishedProjects, icon: FiEye, color: 'from-emerald-500 to-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/10' },
-    { label: 'قيد التنفيذ', value: stats.underConstruction, icon: FiTool, color: 'from-amber-500 to-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/10' },
-    { label: 'مشاريع مكتملة', value: stats.completedProjects, icon: FiCheckCircle, color: 'from-teal-500 to-teal-600', bg: 'bg-teal-50 dark:bg-teal-900/10' },
-    { label: 'قريباً', value: stats.upcomingProjects, icon: FiClock, color: 'from-purple-500 to-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/10' },
-    { label: 'إجمالي المستخدمين', value: stats.totalUsers, icon: FiUsers, color: 'from-pink-500 to-pink-600', bg: 'bg-pink-50 dark:bg-pink-900/10' },
-    { label: 'المستثمرون', value: stats.totalInvestors, icon: FiTrendingUp, color: 'from-gold/80 to-yellow-600', bg: 'bg-yellow-50 dark:bg-yellow-900/10' },
-    { label: 'رسائل جديدة', value: stats.unreadMessages, icon: FiMessageSquare, color: 'from-red-500 to-red-600', bg: 'bg-red-50 dark:bg-red-900/10' },
-  ];
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-24 bg-white dark:bg-dark-light rounded-xl animate-pulse border border-gray-100 dark:border-gray-800" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
+// ─────────────────────────────────────────────────────────────────
+// Components
+// ─────────────────────────────────────────────────────────────────
+function StatCard({ label, value, icon: Icon, color, trend, trendValue, prefix = '' }: any) {
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-dark dark:text-white">لوحة التحكم</h1>
-          <p className="text-sm text-gray-500 mt-1">مرحباً بك في لوحة إدارة هشام للتطوير العقاري</p>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white dark:bg-dark-light rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden group"
+    >
+      <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-10 ${color} group-hover:opacity-20 transition-opacity`} />
+      
+      <div className="flex items-start justify-between mb-4 relative">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} bg-opacity-10 dark:bg-opacity-20`}>
+          <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
         </div>
-        <div className="flex gap-2">
-          <Link
-            to="/projects"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-dark-300 text-gray-700 dark:text-gray-300 text-sm hover:bg-gray-200 dark:hover:bg-dark-400 transition-colors"
-          >
-            <FiExternalLink className="w-4 h-4" />
-            عرض المشاريع
-          </Link>
-          <Link
-            to="/admin/projects/new"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-dark text-sm font-semibold hover:bg-yellow-500 transition-colors shadow-sm"
-          >
-            <FiPlus className="w-4 h-4" />
-            مشروع جديد
-          </Link>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {statCards.map((card, idx) => (
-          <motion.div
-            key={card.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="bg-white dark:bg-dark-light rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className={`w-10 h-10 rounded-lg ${card.bg} flex items-center justify-center`}>
-                <card.icon className={`w-5 h-5 bg-gradient-to-br ${card.color} bg-clip-text`} style={{ color: '#c9a050' }} />
-              </div>
-            </div>
-            <div className="text-2xl font-bold text-dark dark:text-white tabular-nums">{card.value.toLocaleString('ar-EG')}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{card.label}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Recent Projects */}
-      <div className="bg-white dark:bg-dark-light rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-          <div className="flex items-center gap-2">
-            <FiActivity className="w-4 h-4 text-gold" />
-            <h2 className="font-semibold text-dark dark:text-white text-sm">آخر المشاريع المضافة</h2>
-          </div>
-          <Link to="/admin/projects" className="text-xs text-gold hover:underline">
-            عرض الكل
-          </Link>
-        </div>
-
-        {recentProjects.length === 0 ? (
-          <div className="px-6 py-12 text-center text-gray-400 text-sm">
-            لا توجد مشاريع بعد.{' '}
-            <Link to="/admin/projects/new" className="text-gold hover:underline">أضف أول مشروع</Link>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-50 dark:divide-gray-800">
-            {recentProjects.map((project) => (
-              <div key={project.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-dark-300 transition-colors">
-                <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-dark-300">
-                  {project.cover_image ? (
-                    <img src={project.cover_image} alt={project.title_ar} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <FiBox className="w-5 h-5" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-dark dark:text-white text-sm truncate">{project.title_ar}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{project.title_en}</p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[project.status] || 'bg-gray-100 text-gray-600'}`}>
-                    {statusLabels[project.status] || project.status}
-                  </span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${project.published ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'}`}>
-                    {project.published ? 'منشور' : 'مسودة'}
-                  </span>
-                  <Link
-                    to={`/admin/projects/edit/${project.id}`}
-                    className="px-3 py-1 text-xs rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-100 transition-colors"
-                  >
-                    تعديل
-                  </Link>
-                </div>
-              </div>
-            ))}
+        {trend && (
+          <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-md ${trend === 'up' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-50 text-red-600 dark:bg-red-900/30'}`}>
+            {trend === 'up' ? <FiTrendingUp /> : <FiTrendingDown />}
+            {trendValue}%
           </div>
         )}
       </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { label: 'إضافة مشروع', icon: FiPlus, to: '/admin/projects/new', color: 'text-gold border-gold/30 hover:bg-gold/5' },
-          { label: 'إدارة المشاريع', icon: FiBox, to: '/admin/projects', color: 'text-blue-600 border-blue-200 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-800 dark:hover:bg-blue-900/10' },
-          { label: 'عرض الموقع', icon: FiEye, to: '/', color: 'text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/10' },
-          { label: 'صفحة المشاريع', icon: FiExternalLink, to: '/projects', color: 'text-purple-600 border-purple-200 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-800 dark:hover:bg-purple-900/10' },
-        ].map(action => (
-          <Link
-            key={action.label}
-            to={action.to}
-            target={action.to.startsWith('/admin') ? undefined : '_blank'}
-            rel={action.to.startsWith('/admin') ? undefined : 'noopener noreferrer'}
-            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border bg-white dark:bg-dark-light text-sm font-medium transition-all ${action.color}`}
-          >
-            <action.icon className="w-5 h-5" />
-            {action.label}
-          </Link>
-        ))}
+      
+      <div className="relative">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</p>
+        <p className="text-2xl font-bold text-dark dark:text-white tabular-nums">
+          {prefix}{typeof value === 'number' ? value.toLocaleString('ar-EG') : value}
+        </p>
       </div>
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Main Dashboard
+// ─────────────────────────────────────────────────────────────────
+export default function AdminDashboard() {
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
+
+  // State
+  const [dateRange, setDateRange] = useState('30days');
+  const [loading, setLoading] = useState(true);
+  const [kpis, setKpis] = useState<DashboardKPIs | null>(null);
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
+
+  // Calculate Dates
+  const { startDate, endDate } = useMemo(() => {
+    const end = new Date();
+    const start = new Date();
+    if (dateRange === 'today') start.setHours(0, 0, 0, 0);
+    else if (dateRange === '7days') start.setDate(start.getDate() - 7);
+    else if (dateRange === '30days') start.setDate(start.getDate() - 30);
+    else if (dateRange === 'this_year') start.setMonth(0, 1);
+    
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
+  }, [dateRange]);
+
+  // Fetch Data
+  useEffect(() => {
+    let mounted = true;
+    
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [kpiData, projectsData, activityData, txData] = await Promise.all([
+          dashboardService.getKPIs(startDate, endDate),
+          projectsService.getProjects(),
+          isAdmin ? dashboardService.getRecentActivity() : Promise.resolve([]),
+          isAdmin ? dashboardService.getTransactions() : Promise.resolve([]),
+        ]);
+        
+        if (mounted) {
+          setKpis(kpiData);
+          setRecentProjects(projectsData.slice(0, 5));
+          setActivities(activityData);
+          setTransactions(txData);
+        }
+      } catch (err) {
+        console.error('Dashboard Load Error:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    
+    loadData();
+    return () => { mounted = false; };
+  }, [startDate, endDate, isAdmin]);
+
+  // Realtime Subscriptions
+  useEffect(() => {
+    if (!isAdmin) return;
+    const channel = supabase.channel('dashboard_realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'inquiries' }, () => {
+        setKpis(prev => prev ? { ...prev, total_leads: prev.total_leads + 1, new_leads: prev.new_leads + 1 } : null);
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'page_views' }, () => {
+        setKpis(prev => prev ? { ...prev, total_views: prev.total_views + 1 } : null);
+      })
+      .subscribe();
+      
+    return () => { supabase.removeChannel(channel); };
+  }, [isAdmin]);
+
+  return (
+    <div className="space-y-8" dir="rtl">
+      
+      {/* ═══ Header & Filters ═══ */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-dark-light p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-bold text-dark dark:text-white flex items-center gap-2">
+            <FiPieChart className="text-gold" />
+            مركز التحكم الموحد
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Company Control Center — {profile?.full_name}</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <FiCalendar className="text-gray-400 w-4 h-4" />
+          <select 
+            value={dateRange} 
+            onChange={e => setDateRange(e.target.value)}
+            className="bg-gray-50 dark:bg-dark border border-gray-200 dark:border-gray-700 rounded-lg py-2 px-4 text-sm font-medium focus:outline-none focus:border-gold"
+          >
+            <option value="today">اليوم</option>
+            <option value="7days">آخر 7 أيام</option>
+            <option value="30days">آخر 30 يوم</option>
+            <option value="this_year">هذا العام</option>
+          </select>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-10 h-10 border-4 border-gold/20 border-t-gold rounded-full animate-spin" />
+        </div>
+      ) : !kpis ? (
+        <div className="bg-red-50 text-red-600 p-6 rounded-2xl">خطأ في تحميل البيانات.</div>
+      ) : (
+        <>
+          {/* ═══ Executive KPIs ═══ */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <StatCard label="إجمالي المشاريع" value={kpis.total_projects} icon={FiBox} color="bg-blue-500" />
+            <StatCard label="مشاريع نشطة" value={kpis.active_projects} icon={FiTool} color="bg-amber-500" />
+            <StatCard label="إجمالي العملاء" value={kpis.total_customers} icon={FiUsers} color="bg-purple-500" />
+            <StatCard label="الطلبات (Leads)" value={kpis.total_leads} icon={FiMessageSquare} color="bg-pink-500" />
+            <StatCard label="مشاهدات الموقع" value={kpis.total_views} icon={FiEye} color="bg-emerald-500" trend="up" trendValue={12} />
+          </div>
+
+          {/* ═══ Financial Overview (Admin Only) ═══ */}
+          {isAdmin && (
+            <div className="bg-white dark:bg-dark-light rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <FiDollarSign className="w-5 h-5 text-gold" />
+                <h2 className="text-lg font-bold text-dark dark:text-white">اللوحة المالية (Financial Overview)</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-5 rounded-xl bg-gray-50 dark:bg-dark border border-gray-100 dark:border-gray-800">
+                  <p className="text-sm text-gray-500 mb-1">الإيرادات (Revenue)</p>
+                  <p className="text-2xl font-bold text-emerald-600">EGP {kpis.total_revenue.toLocaleString('ar-EG')}</p>
+                </div>
+                <div className="p-5 rounded-xl bg-gray-50 dark:bg-dark border border-gray-100 dark:border-gray-800">
+                  <p className="text-sm text-gray-500 mb-1">المصروفات (Expenses)</p>
+                  <p className="text-2xl font-bold text-red-600">EGP {kpis.total_expenses.toLocaleString('ar-EG')}</p>
+                </div>
+                <div className="p-5 rounded-xl bg-gray-50 dark:bg-dark border border-gray-100 dark:border-gray-800">
+                  <p className="text-sm text-gray-500 mb-1">صافي الربح (Net Profit)</p>
+                  <p className={`text-2xl font-bold ${kpis.net_profit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                    EGP {kpis.net_profit.toLocaleString('ar-EG')}
+                  </p>
+                </div>
+              </div>
+
+              {transactions.length === 0 && (
+                <div className="mt-6 flex flex-col items-center justify-center py-8 bg-gray-50 dark:bg-dark/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+                  <FiAlertCircle className="w-8 h-8 text-gray-400 mb-3" />
+                  <p className="text-gray-500 font-medium">لا توجد معاملات مالية مسجلة بعد.</p>
+                  <p className="text-sm text-gray-400 mt-1">Setup Required: ابدأ بإضافة الـ Transactions لتفعيل الحسابات.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ═══ Data Grids ═══ */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Projects Overview */}
+            <div className="bg-white dark:bg-dark-light rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                <h2 className="font-bold text-dark dark:text-white flex items-center gap-2">
+                  <FiBox className="text-gold" />
+                  أداء المشاريع
+                </h2>
+                <Link to="/admin/projects" className="text-xs text-gold hover:underline">عرض الكل</Link>
+              </div>
+              <div className="divide-y divide-gray-50 dark:divide-gray-800">
+                {recentProjects.map(p => (
+                  <div key={p.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-dark transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-dark-300 overflow-hidden">
+                        {p.cover_image && <img src={p.cover_image} className="w-full h-full object-cover" alt="" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-dark dark:text-white">{p.title_ar}</p>
+                        <p className="text-xs text-gray-500">{p.status}</p>
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs font-bold text-gold">{p.progress}%</p>
+                      <p className="text-[10px] text-gray-400">إنجاز</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Activity (Audit Log) - Admin Only */}
+            {isAdmin && (
+              <div className="bg-white dark:bg-dark-light rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                  <h2 className="font-bold text-dark dark:text-white flex items-center gap-2">
+                    <FiActivity className="text-gold" />
+                    سجل النشاطات (Audit Log)
+                  </h2>
+                </div>
+                <div className="p-2">
+                  {activities.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500 text-sm">لا توجد نشاطات مسجلة مؤخراً.</div>
+                  ) : (
+                    <div className="space-y-1">
+                      {activities.map(act => (
+                        <div key={act.id} className="p-3 hover:bg-gray-50 dark:hover:bg-dark rounded-lg flex gap-3 text-sm transition-colors">
+                          <div className="w-2 h-2 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-dark dark:text-gray-200">
+                              <span className="font-semibold text-gold">{act.profiles?.full_name || 'System'}</span>{' '}
+                              {act.action} <span className="text-gray-500">على</span> {act.entity}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">{new Date(act.created_at).toLocaleString('ar-EG')}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+          </div>
+        </>
+      )}
     </div>
   );
 }

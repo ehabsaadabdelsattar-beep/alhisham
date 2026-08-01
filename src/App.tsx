@@ -36,6 +36,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProjects = lazy(() => import('./pages/admin/AdminProjects'));
 const AdminProjectForm = lazy(() => import('./pages/admin/AdminProjectForm'));
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminRequests = lazy(() => import('./pages/admin/AdminRequests'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-dark">
@@ -84,6 +85,7 @@ function AnimatedRoutes() {
                   <Route path="projects/new" element={<AdminProjectForm />} />
                   <Route path="projects/edit/:id" element={<AdminProjectForm />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="requests" element={<AdminRequests />} />
                 </Route>
               </Route>
 

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../../components/ui/SEO';
 import {
   FiHome, FiBox, FiFileText, FiImage, FiUsers,
-  FiMessageSquare, FiSettings, FiLogOut, FiActivity,
+  FiMessageSquare, FiInbox, FiSettings, FiLogOut, FiActivity,
   FiExternalLink, FiMenu, FiX, FiGlobe
 } from 'react-icons/fi';
 
@@ -15,6 +15,7 @@ const navItems = [
   { name: 'المقالات', path: '/admin/articles', icon: FiFileText },
   { name: 'مكتبة الوسائط', path: '/admin/media', icon: FiImage },
   { name: 'المستخدمون', path: '/admin/users', icon: FiUsers },
+  { name: 'الطلبات', path: '/admin/requests', icon: FiInbox },
   { name: 'الرسائل', path: '/admin/messages', icon: FiMessageSquare },
   { name: 'سجل النشاطات', path: '/admin/logs', icon: FiActivity },
   { name: 'الإعدادات', path: '/admin/settings', icon: FiSettings },

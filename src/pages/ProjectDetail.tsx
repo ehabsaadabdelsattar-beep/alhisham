@@ -6,6 +6,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useLang } from '../context/LanguageContext';
 import { projectsService } from '../services/projects';
 import type { Project } from '../services/projects';
+import { inquiriesService } from '../services/inquiries';
 import SEO from '../components/ui/SEO';
 import { useAuth } from '../context/AuthContext';
 
@@ -228,12 +229,14 @@ export default function ProjectDetail() {
   const [relatedProjects, setRelatedProjects] = useState<Project[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState('overview');
+  const [contactSubmitting, setContactSubmitting] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: profile?.full_name || '',
     email: user?.email || '',
     phone: profile?.phone || '',
     message: '',
     submitted: false,
+    error: '',
   });
 
   useEffect(() => {
@@ -325,9 +328,36 @@ export default function ProjectDetail() {
   const hasLocation = mapEmbedUrl || locationDisplay;
   const hasGallery = galleryImages.length > 0;
 
-  const sendToWhatsApp = () => {
-    const msg = encodeURIComponent(`مرحباً، أود الاستفسار عن مشروع: ${title}\n${contactForm.name ? 'الاسم: ' + contactForm.name : ''}\n${contactForm.phone ? 'الهاتف: ' + contactForm.phone : ''}`);
+  const whatsAppMsg = (name: string, phone: string) => {
+    const msg = encodeURIComponent(`مرحباً، أود الاستفسار عن مشروع: ${title}\n${name ? 'الاسم: ' + name : ''}\n${phone ? 'الهاتف: ' + phone : ''}`);
     window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank');
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (contactSubmitting) return;
+    setContactSubmitting(true);
+    setContactForm(prev => ({ ...prev, error: '' }));
+    try {
+      await inquiriesService.createInquiry({
+        user_id: user?.id || null,
+        full_name: contactForm.name,
+        email: contactForm.email || undefined,
+        phone: contactForm.phone,
+        project_id: project?.id || null,
+        project_name: title || null,
+        message: contactForm.message || undefined,
+      });
+      whatsAppMsg(contactForm.name, contactForm.phone);
+      setContactForm(prev => ({ ...prev, submitted: true }));
+    } catch (err: any) {
+      console.error('Inquiry submit error:', err);
+      // Still send WhatsApp even if DB save fails
+      whatsAppMsg(contactForm.name, contactForm.phone);
+      setContactForm(prev => ({ ...prev, submitted: true }));
+    } finally {
+      setContactSubmitting(false);
+    }
   };
 
   const navItems = [
@@ -866,11 +896,7 @@ export default function ProjectDetail() {
                 </div>
               ) : (
                 <form
-                  onSubmit={e => {
-                    e.preventDefault();
-                    sendToWhatsApp();
-                    setContactForm(prev => ({ ...prev, submitted: true }));
-                  }}
+                  onSubmit={handleContactSubmit}
                   className="space-y-4"
                 >
                   <h3 className="text-lg font-bold text-white mb-6">{isRtl ? 'اطلب استشارة مجانية' : 'Request a Free Consultation'}</h3>
@@ -902,10 +928,17 @@ export default function ProjectDetail() {
                       placeholder={isRtl ? 'أخبرنا ما الذي يهمك في هذا المشروع...' : 'Tell us what interests you about this project...'}
                     />
                   </div>
-                  <button type="submit"
-                    className="w-full bg-gold hover:bg-gold/90 text-dark font-bold py-4 rounded-xl text-sm tracking-wider transition-all hover:shadow-[0_0_25px_rgba(212,175,55,0.3)]"
+                  {contactForm.error && (
+                    <p className="text-red-400 text-xs">{contactForm.error}</p>
+                  )}
+                  <button type="submit" disabled={contactSubmitting}
+                    className="w-full bg-gold hover:bg-gold/90 text-dark font-bold py-4 rounded-xl text-sm tracking-wider transition-all hover:shadow-[0_0_25px_rgba(212,175,55,0.3)] disabled:opacity-60 disabled:cursor-wait flex items-center justify-center gap-2"
                   >
-                    {isRtl ? 'إرسال الطلب' : 'Send Request'}
+                    {contactSubmitting ? (
+                      <><div className="w-4 h-4 border-2 border-dark/30 border-t-dark rounded-full animate-spin" /> {isRtl ? 'جاري الإرسال...' : 'Sending...'}</>
+                    ) : (
+                      isRtl ? 'إرسال الطلب' : 'Send Request'
+                    )}
                   </button>
                 </form>
               )}

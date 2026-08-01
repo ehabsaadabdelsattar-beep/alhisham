@@ -76,6 +76,31 @@ export default function Profile() {
     }
   };
 
+  const resizeImage = (file: File, maxSize = 400): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          if (width > height) {
+            if (width > maxSize) { height = Math.round((height * maxSize) / width); width = maxSize; }
+          } else {
+            if (height > maxSize) { width = Math.round((width * maxSize) / height); height = maxSize; }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d')?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
@@ -89,16 +114,18 @@ export default function Profile() {
         throw new Error(lang === 'ar' ? 'حجم الصورة يجب أن يكون أقل من 5 ميغابايت.' : 'Image size must be less than 5MB.');
       }
 
-      const fileExt = file.name.split('.').pop();
-      const filePath = `avatars/${profile?.id}-${Date.now()}.${fileExt}`;
+      // Resize + compress to max 400px
+      const base64 = await resizeImage(file, 400);
 
-      const { error: uploadError } = await supabase.storage.from('media').upload(filePath, file, { upsert: true });
-      if (uploadError) throw uploadError;
+      // Save directly to profiles (no Storage needed)
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: base64 })
+        .eq('id', user?.id);
 
-      const { data } = supabase.storage.from('media').getPublicUrl(filePath);
-      const { error: updateError } = await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', profile?.id);
-      if (updateError) throw updateError;
+      if (updateError) throw new Error(updateError.message);
 
+      setAvatarUrl(base64);
       await refreshProfile();
       setMsg({ type: 'success', text: lang === 'ar' ? 'تم تحديث الصورة الشخصية بنجاح.' : 'Profile picture updated successfully.' });
     } catch (error: any) {

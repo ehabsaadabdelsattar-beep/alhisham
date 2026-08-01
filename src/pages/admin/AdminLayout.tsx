@@ -6,19 +6,20 @@ import SEO from '../../components/ui/SEO';
 import {
   FiHome, FiBox, FiFileText, FiImage, FiUsers,
   FiMessageSquare, FiInbox, FiSettings, FiLogOut, FiActivity,
-  FiExternalLink, FiMenu, FiX, FiGlobe
+  FiExternalLink, FiMenu, FiX, FiGlobe, FiDollarSign, FiCreditCard
 } from 'react-icons/fi';
 
-const navItems = [
+const baseNavItems = [
   { name: 'الرئيسية', path: '/admin', icon: FiHome, exact: true },
   { name: 'المشاريع', path: '/admin/projects', icon: FiBox },
   { name: 'المقالات', path: '/admin/articles', icon: FiFileText },
   { name: 'مكتبة الوسائط', path: '/admin/media', icon: FiImage },
   { name: 'المستخدمون', path: '/admin/users', icon: FiUsers },
   { name: 'الطلبات', path: '/admin/requests', icon: FiInbox },
-  { name: 'الرسائل', path: '/admin/messages', icon: FiMessageSquare },
-  { name: 'سجل النشاطات', path: '/admin/logs', icon: FiActivity },
-  { name: 'الإعدادات', path: '/admin/settings', icon: FiSettings },
+  { name: 'المعاملات المالية', path: '/admin/transactions', icon: FiDollarSign, adminOnly: true },
+  { name: 'المصروفات', path: '/admin/expenses', icon: FiCreditCard, adminOnly: true },
+  { name: 'سجل النشاطات', path: '/admin/logs', icon: FiActivity, adminOnly: true },
+  { name: 'الإعدادات', path: '/admin/settings', icon: FiSettings, adminOnly: true },
 ];
 
 function getInitials(name: string | null): string {
@@ -39,6 +40,11 @@ export default function AdminLayout() {
 
   const isActive = (path: string, exact = false) =>
     exact ? location.pathname === path : (location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path)));
+
+  const navItems = baseNavItems.filter(item => {
+    if (item.adminOnly && profile?.role !== 'admin') return false;
+    return true;
+  });
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">

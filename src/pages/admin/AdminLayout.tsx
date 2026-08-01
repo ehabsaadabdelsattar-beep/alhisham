@@ -6,7 +6,7 @@ import SEO from '../../components/ui/SEO';
 import {
   FiHome, FiBox, FiFileText, FiImage, FiUsers,
   FiMessageSquare, FiInbox, FiSettings, FiLogOut, FiActivity,
-  FiExternalLink, FiMenu, FiX, FiGlobe, FiDollarSign, FiCreditCard
+  FiExternalLink, FiMenu, FiX, FiGlobe, FiDollarSign, FiCreditCard, FiTarget
 } from 'react-icons/fi';
 
 const baseNavItems = [
@@ -16,6 +16,7 @@ const baseNavItems = [
   { name: 'مكتبة الوسائط', path: '/admin/media', icon: FiImage },
   { name: 'المستخدمون', path: '/admin/users', icon: FiUsers },
   { name: 'الطلبات', path: '/admin/requests', icon: FiInbox },
+  { name: 'إدارة العملاء (CRM)', path: '/admin/crm', icon: FiTarget },
   { name: 'المعاملات المالية', path: '/admin/transactions', icon: FiDollarSign, adminOnly: true },
   { name: 'المصروفات', path: '/admin/expenses', icon: FiCreditCard, adminOnly: true },
   { name: 'سجل النشاطات', path: '/admin/logs', icon: FiActivity, adminOnly: true },

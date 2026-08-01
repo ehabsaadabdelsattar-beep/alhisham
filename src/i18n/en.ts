@@ -204,7 +204,7 @@ const en = {
     open: 'Open',
     years: 'Years',
     sqm: 'SQM',
-    sar: 'SAR',
+    sar: 'EGP',
   },
   cta: {
     subtitle: 'Start Your Investment Journey',

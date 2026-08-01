@@ -239,8 +239,8 @@ export default function ProjectDetail() {
                         {lang === 'ar' ? 'نطاق الأسعار' : 'Price Range'}
                       </p>
                       <p className="text-2xl font-bold text-gold font-english">
-                        {project.price_from ? `${project.price_from.toLocaleString()} SAR` : ''} 
-                        {project.price_to ? ` - ${project.price_to.toLocaleString()} SAR` : ''}
+                        {project.price_from ? `${project.price_from.toLocaleString()} ${t('common.sar')}` : ''} 
+                        {project.price_to ? ` - ${project.price_to.toLocaleString()} ${t('common.sar')}` : ''}
                       </p>
                     </div>
                     <button
@@ -293,41 +293,41 @@ export default function ProjectDetail() {
                 </motion.div>
               )}
 
-              {/* Map Embed or Google Maps Link */}
-              {(project.map_embed_url || project.google_maps_url) && (
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-2xl font-bold text-white">
-                      {lang === 'ar' ? 'موقع المشروع على الخريطة' : 'Project Location Map'}
-                    </h3>
-                    {project.google_maps_url && (
-                      <a
-                        href={project.google_maps_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-gold hover:underline flex items-center gap-1"
-                      >
-                        {lang === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'} ↗
-                      </a>
-                    )}
-                  </div>
-                  <div className="gold-divider mb-6" />
-                  {project.map_embed_url && (
-                    <div className="h-96 overflow-hidden rounded-sm border border-white/10 shadow-2xl">
-                      <iframe
-                        src={project.map_embed_url}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title="Project Location"
-                      />
-                    </div>
+              {/* Interactive Embedded Google Map */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-2xl font-bold text-white">
+                    {lang === 'ar' ? 'موقع المشروع على الخريطة' : 'Project Location Map'}
+                  </h3>
+                  {project.google_maps_url && (
+                    <a
+                      href={project.google_maps_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-gold hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      {lang === 'ar' ? 'فتح الملاحة في خرائط جوجل' : 'Open in Google Maps'} ↗
+                    </a>
                   )}
-                </motion.div>
-              )}
+                </div>
+                <div className="gold-divider mb-6" />
+                <div className="h-96 overflow-hidden rounded-sm border border-white/10 shadow-2xl relative bg-dark-300">
+                  <iframe
+                    src={
+                      project.map_embed_url && project.map_embed_url.includes('http')
+                        ? project.map_embed_url
+                        : `https://maps.google.com/maps?q=${encodeURIComponent(project.google_maps_url || address || location || title)}&t=&z=14&ie=UTF8&iwloc=&output=embed`
+                    }
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Project Location Map"
+                  />
+                </div>
+              </motion.div>
             </div>
 
             {/* Sidebar Details */}

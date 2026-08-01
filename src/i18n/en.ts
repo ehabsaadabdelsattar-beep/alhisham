@@ -94,9 +94,9 @@ const en = {
   beforeafter: {
     subtitle: 'Before & After',
     title: 'Real Transformation in Every Project',
-    description: 'We transform spaces into architectural masterpieces that add genuine value and last for generations.',
-    before: 'Before',
-    after: 'After',
+    description: 'We transform empty spaces into vibrant architectural masterpieces, providing luxury residential units that offer comfort and security for families, and integrated commercial malls that meet all shopping and entertainment needs, embodying our pioneering vision as a real estate development company creating lasting value for generations.',
+    before: 'Before Construction',
+    after: 'After Delivery',
   },
   testimonials: {
     subtitle: 'Client Reviews',
@@ -205,6 +205,19 @@ const en = {
     years: 'Years',
     sqm: 'SQM',
     sar: 'SAR',
+  },
+  cta: {
+    subtitle: 'Start Your Investment Journey',
+    title: 'Are You Ready to Own',
+    title_gold: 'Your Ideal Property?',
+    description: 'Our real estate development experts are ready to help you make the best investment decisions. Get your free consultation now.',
+    cta_consult: 'Request Free Consultation',
+    cta_whatsapp: 'Contact via WhatsApp',
+    cta_projects: 'Browse Our Projects',
+    trust_1: '15+ Years Experience',
+    trust_2: '120+ Projects Delivered',
+    trust_3: '500+ Satisfied Clients',
+    trust_4: 'Free Consultation',
   },
 };
 

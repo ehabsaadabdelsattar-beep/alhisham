@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تأكيد البريد الإلكتروني - هشام للتطوير العقاري</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      direction: rtl;
+      text-align: right;
+    }
+    .wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .header-logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #c9a050;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .header-sub {
+      font-size: 13px;
+      color: #ffffff80;
+      letter-spacing: 0.5px;
+    }
+    .body {
+      padding: 40px 32px;
+    }
+    .greeting {
+      font-size: 22px;
+      font-weight: bold;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+    }
+    .text {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+    .cta-wrapper {
+      text-align: center;
+      margin: 36px 0;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #c9a050, #e8c070);
+      color: #1a1a2e;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px rgba(201,160,80,0.3);
+    }
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 28px 0;
+    }
+    .link-fallback {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.8;
+    }
+    .link-fallback a {
+      color: #c9a050;
+      word-break: break-all;
+    }
+    .footer {
+      background: #f8f8f8;
+      padding: 24px 32px;
+      text-align: center;
+      border-top: 1px solid #eee;
+    }
+    .footer-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: #aaa;
+    }
+    @media (max-width: 600px) {
+      .body, .header, .footer { padding: 24px 20px; }
+      .greeting { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-logo">هشام للتطوير العقاري</div>
+        <div class="header-sub">AL HISHAM DEVELOPMENT</div>
+      </div>
+
+      <!-- Body -->
+      <div class="body">
+        <p class="greeting">مرحباً {{ .Data.full_name }}،</p>
+        <p class="text">شكراً لتسجيلك في منصة <strong>هشام للتطوير العقاري</strong>. يسعدنا انضمامك إلى مجتمعنا العقاري المميز.</p>
+        <p class="text">لإتمام عملية التسجيل وتفعيل حسابك، يرجى الضغط على الزر أدناه:</p>
+
+        <div class="cta-wrapper">
+          <a href="{{ .ConfirmationURL }}" class="cta-button">
+            تأكيد البريد الإلكتروني
+          </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="link-fallback">
+          إذا لم يعمل الزر أعلاه، يمكنك نسخ الرابط التالي ولصقه في المتصفح:<br />
+          <a href="{{ .ConfirmationURL }}">{{ .ConfirmationURL }}</a>
+        </p>
+
+        <div class="divider"></div>
+
+        <p class="text" style="font-size:13px; color:#999;">
+          إذا لم تقم بإنشاء هذا الحساب، يمكنك تجاهل هذه الرسالة بشكل آمن. لن يتم تفعيل أي حساب بدون تأكيدك.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-name">هشام للتطوير العقاري</div>
+        <div class="footer-copy">© {{ .CurrentYear }} جميع الحقوق محفوظة</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

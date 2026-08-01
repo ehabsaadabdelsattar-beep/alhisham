@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ============================================================
-   GLOBAL BASE STYLES
+   GLOBAL BASE STYLES - AL HISHAM DEVELOPMENT (LUXURY REAL ESTATE)
    ============================================================ */
 
 * {
@@ -13,12 +13,14 @@
 }
 
 :root {
-  --primary: #1B4332;
-  --primary-light: #2D6A4F;
-  --gold: #C9A84C;
-  --gold-light: #E8C96A;
+  --primary: #0A0A0A;
+  --primary-light: #1A1A1A;
+  --gold: #C9A050;
+  --gold-light: #DFBA68;
+  --gold-dark: #A47E33;
   --dark: #0A0A0A;
   --surface: #F8F8F6;
+  --surface-dark: #121212;
 }
 
 html {
@@ -31,7 +33,7 @@ body {
   background-color: var(--surface);
   color: var(--dark);
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .dark body {
@@ -39,7 +41,7 @@ body {
   color: #F8F8F6;
 }
 
-/* RTL / LTR Support */
+/* RTL / LTR Typography */
 [dir="ltr"] {
   font-family: 'Outfit', sans-serif;
 }
@@ -49,67 +51,73 @@ body {
 }
 
 /* ============================================================
-   SCROLLBAR
+   LUXURY SCROLLBAR
    ============================================================ */
 
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #0A0A0A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1B4332;
-  border-radius: 3px;
+  background: #C9A050;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C9A84C;
+  background: #DFBA68;
 }
 
 /* ============================================================
-   UTILITY CLASSES
+   UTILITY CLASSES & COMPONENTS
    ============================================================ */
 
 @layer components {
+  /* Primary Black Luxury Button */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-semibold rounded-none
-           hover:bg-primary-light transition-all duration-300 hover:shadow-green hover:-translate-y-0.5
-           border border-primary hover:border-primary-light text-sm tracking-widest uppercase;
+    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-dark text-white font-semibold rounded-none
+           hover:bg-gold hover:text-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5
+           border border-dark hover:border-gold text-xs tracking-[0.2em] uppercase;
   }
 
+  /* Gold Luxury Button */
   .btn-gold {
-    @apply inline-flex items-center gap-2 px-8 py-4 bg-gold text-dark font-semibold rounded-none
+    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-gold text-dark font-bold rounded-none
            hover:bg-gold-light transition-all duration-300 hover:shadow-gold hover:-translate-y-0.5
-           border border-gold text-sm tracking-widest uppercase;
+           border border-gold text-xs tracking-[0.2em] uppercase;
   }
 
+  /* White Outline Button */
   .btn-outline {
-    @apply inline-flex items-center gap-2 px-8 py-4 bg-transparent text-white font-semibold rounded-none
-           border border-white hover:bg-white hover:text-dark transition-all duration-300
-           text-sm tracking-widest uppercase;
+    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-transparent text-white font-semibold rounded-none
+           border border-white/40 hover:border-gold hover:text-gold transition-all duration-300
+           text-xs tracking-[0.2em] uppercase;
   }
 
-  .btn-outline-primary {
-    @apply inline-flex items-center gap-2 px-8 py-4 bg-transparent text-primary font-semibold rounded-none
-           border border-primary hover:bg-primary hover:text-white transition-all duration-300
-           text-sm tracking-widest uppercase;
+  /* Gold Outline Button */
+  .btn-outline-gold {
+    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-transparent text-gold font-semibold rounded-none
+           border border-gold/50 hover:bg-gold hover:text-dark transition-all duration-300
+           text-xs tracking-[0.2em] uppercase;
   }
 
+  /* Typography */
   .section-title {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-dark dark:text-white leading-tight;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-dark dark:text-white leading-[1.15] tracking-tight;
   }
 
   .section-subtitle {
-    @apply text-gold font-medium tracking-[0.3em] uppercase text-sm mb-4;
+    @apply text-gold font-semibold tracking-[0.3em] uppercase text-xs mb-3 inline-block;
   }
 
+  /* Luxury Card Base */
   .card-luxury {
-    @apply bg-white dark:bg-dark-200 shadow-luxury hover:shadow-luxury-dark 
-           transition-all duration-500 hover:-translate-y-2 overflow-hidden;
+    @apply bg-white dark:bg-dark-100 border border-gray-100 dark:border-gray-800/80 shadow-luxury hover:shadow-luxury-dark 
+           transition-all duration-500 hover:-translate-y-1.5 overflow-hidden rounded-none;
   }
 
   .gold-divider {
-    @apply w-16 h-0.5 bg-gold-gradient my-4;
+    @apply w-16 h-0.5 bg-gradient-to-r from-gold via-gold-light to-transparent my-4;
   }
 
   .container-custom {
@@ -117,46 +125,30 @@ body {
   }
 
   .section-padding {
-    @apply py-20 md:py-28 lg:py-36;
+    @apply py-20 sm:py-28 lg:py-36;
   }
 
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #C9A84C 0%, #E8C96A 50%, #A8852E 100%);
-  }
-
-  .text-gradient-green {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #1B4332 0%, #40916C 100%);
+    background-image: linear-gradient(135deg, #DFBA68 0%, #C9A050 50%, #A47E33 100%);
   }
 
   .overlay-dark {
-    @apply absolute inset-0 bg-black/60;
+    @apply absolute inset-0 bg-black/65;
   }
 
   .overlay-gradient {
     @apply absolute inset-0;
-    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.5) 50%, transparent 100%);
+    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.4) 60%, transparent 100%);
   }
 
-  .glass-card {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
-  }
-
+  /* Glassmorphism Luxury Cards */
   .glass-card-dark {
-    @apply bg-black/20 backdrop-blur-xl border border-white/10;
+    @apply bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl;
   }
 
-  .glass-card-premium {
-    @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl;
-  }
-
-  .premium-shadow {
-    box-shadow: 0 4px 40px -8px rgba(0, 0, 0, 0.08), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
-  }
-
-  .premium-shadow-dark {
-    box-shadow: 0 8px 60px -12px rgba(0, 0, 0, 0.3), 0 4px 16px -4px rgba(0, 0, 0, 0.15);
+  .glass-card-gold {
+    @apply bg-black/70 backdrop-blur-2xl border border-gold/25 shadow-2xl;
   }
 
   .nav-link {
@@ -164,64 +156,6 @@ body {
            after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gold
            after:transition-all after:duration-300 hover:after:w-full hover:text-gold;
   }
-}
-
-/* ============================================================
-   HERO VIDEO BACKGROUND
-   ============================================================ */
-
-.hero-video-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.hero-video-container video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-/* ============================================================
-   BEFORE/AFTER SLIDER
-   ============================================================ */
-
-.before-after-container {
-  position: relative;
-  overflow: hidden;
-  cursor: col-resize;
-  user-select: none;
-}
-
-.before-after-slider {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #C9A84C;
-  z-index: 10;
-  cursor: col-resize;
-}
-
-.before-after-handle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 48px;
-  height: 48px;
-  background: #C9A84C;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.6);
 }
 
 /* ============================================================
@@ -237,11 +171,16 @@ body {
   display: flex;
   gap: 60px;
   width: max-content;
-  animation: marquee 30s linear infinite;
+  animation: marquee 35s linear infinite;
 }
 
 .marquee-track:hover {
   animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ============================================================
@@ -249,8 +188,8 @@ body {
    ============================================================ */
 
 .swiper-pagination-bullet {
-  background: #C9A84C !important;
-  opacity: 0.4;
+  background: #C9A050 !important;
+  opacity: 0.3;
   width: 8px;
   height: 8px;
 }
@@ -264,119 +203,26 @@ body {
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #C9A84C !important;
-  background: rgba(27, 67, 50, 0.8);
+  color: #C9A050 !important;
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid rgba(201, 160, 80, 0.3);
   width: 48px !important;
   height: 48px !important;
-  border-radius: 50%;
+  border-radius: 0;
 }
 
 .swiper-button-next::after,
 .swiper-button-prev::after {
-  font-size: 18px !important;
+  font-size: 16px !important;
 }
 
 /* ============================================================
-   FAQ ACCORDION
-   ============================================================ */
-
-.faq-item {
-  border-bottom: 1px solid rgba(27, 67, 50, 0.15);
-}
-
-.faq-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.3s ease;
-}
-
-.faq-content.open {
-  max-height: 500px;
-}
-
-/* ============================================================
-   WHATSAPP FLOAT BUTTON
-   ============================================================ */
-
-.whatsapp-float {
-  position: fixed;
-  bottom: 100px;
-  right: 24px;
-  z-index: 9999;
-  animation: float 3s ease-in-out infinite;
-}
-
-[dir="ltr"] .whatsapp-float {
-  right: 24px;
-  left: auto;
-}
-
-[dir="rtl"] .whatsapp-float {
-  left: 24px;
-  right: auto;
-}
-
-/* ============================================================
-   AI CHAT BUTTON
-   ============================================================ */
-
-.ai-chat-float {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999;
-}
-
-[dir="ltr"] .ai-chat-float {
-  right: 24px;
-  left: auto;
-}
-
-[dir="rtl"] .ai-chat-float {
-  left: 24px;
-  right: auto;
-}
-
-/* ============================================================
-   PROGRESS BAR
-   ============================================================ */
-
-.progress-bar {
-  height: 6px;
-  background: rgba(27, 67, 50, 0.15);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #1B4332, #40916C);
-  border-radius: 3px;
-  transition: width 1.5s ease-out;
-}
-
-/* ============================================================
-   DARK MODE
+   DARK MODE OVERRIDES
    ============================================================ */
 
 .dark .card-luxury {
-  background: #1A1A1A;
-  border: 1px solid rgba(255,255,255,0.05);
-}
-
-/* ============================================================
-   LOADING SKELETON
-   ============================================================ */
-
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  background: #121212;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 /* ============================================================
@@ -384,42 +230,6 @@ body {
    ============================================================ */
 
 ::selection {
-  background: rgba(27, 67, 50, 0.2);
-  color: #1B4332;
+  background: rgba(201, 160, 80, 0.25);
+  color: #C9A050;
 }
-
-/* ============================================================
-   RESPONSIVE TYPOGRAPHY
-   ============================================================ */
-
-@media (max-width: 640px) {
-  .section-title {
-    font-size: 2rem;
-  }
-}
-
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.7s ease-out forwards;
-}
-
-.animation-delay-100 { animation-delay: 0.1s; }
-.animation-delay-200 { animation-delay: 0.2s; }
-.animation-delay-300 { animation-delay: 0.3s; }
-.animation-delay-400 { animation-delay: 0.4s; }
-.animation-delay-500 { animation-delay: 0.5s; }
-.animation-delay-600 { animation-delay: 0.6s; }

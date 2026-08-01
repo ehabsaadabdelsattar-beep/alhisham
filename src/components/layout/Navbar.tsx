@@ -1,62 +1,62 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLang } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
+import { useLang } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import {
+  FiSun, FiMoon, FiUser, FiLogOut, FiSettings,
+  FiChevronDown, FiX, FiShield, FiBarChart2, FiGlobe
+} from 'react-icons/fi';
 
 const WHATSAPP_NUMBER = '201103657888';
 
-const serviceItems = [
-  { icon: '🏗️', title: 'التطوير العقاري', desc: 'مشاريع سكنية وتجارية فاخرة', path: '/#services' },
-  { icon: '📋', title: 'إدارة المشاريع', desc: 'إشراف متكامل على جميع المراحل', path: '/#services' },
-  { icon: '📈', title: 'الاستثمار العقاري', desc: 'فرص استثمارية بعوائد مضمونة', path: '/#services' },
-  { icon: '🏛️', title: 'الاستشارات الهندسية', desc: 'خبراء هندسيون ومعماريون', path: '/#services' },
-  { icon: '📣', title: 'التسويق العقاري', desc: 'استراتيجيات تسويقية مبتكرة', path: '/#services' },
-  { icon: '🔑', title: 'إدارة الأصول', desc: 'صون قيمة محفظتك العقارية', path: '/#services' },
-];
+// Generate initials from name, e.g. "Ahmed Mohamed" → "AM"
+function getInitials(name: string | null): string {
+  if (!name) return 'U';
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(n => n[0].toUpperCase())
+    .join('');
+}
 
-const projectItems = [
-  { title: 'المشاريع السكنية', path: '/projects?filter=residential' },
-  { title: 'المشاريع التجارية', path: '/projects?filter=commercial' },
-  { title: 'المشاريع المتعددة', path: '/projects?filter=mixed' },
-  { title: 'المشاريع قيد التنفيذ', path: '/projects?status=ongoing' },
-  { title: 'المشاريع المنجزة', path: '/projects?status=completed' },
-  { title: 'المشاريع القادمة', path: '/projects?status=upcoming' },
-];
+function AvatarDisplay({ avatarUrl, fullName, size = 'md' }: { avatarUrl: string | null; fullName: string | null; size?: 'sm' | 'md' }) {
+  const sizeClass = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={fullName || 'User'}
+        className={`${sizeClass} rounded-full object-cover ring-2 ring-gold/40 shadow-md`}
+      />
+    );
+  }
+  return (
+    <div className={`${sizeClass} rounded-full bg-gradient-to-br from-gold/90 to-yellow-600 flex items-center justify-center font-bold text-dark ring-2 ring-gold/40 shadow-md`}>
+      {getInitials(fullName)}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const { t } = useTranslation();
   const { lang, toggleLang, isRTL } = useLang();
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [megaMenu, setMegaMenu] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const megaRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-    setMegaMenu(null);
-  }, [location]);
-
-  // Close mega menu when clicking outside
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
-        setMegaMenu(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+  const { session, profile, loading, signOut } = useAuth();
+  const isLoggedIn = !!session;
 
   const navLinks = [
     { key: 'nav.home', path: '/' },
@@ -68,14 +68,71 @@ export default function Navbar() {
     { key: 'nav.contact', path: '/contact' },
   ];
 
+  const serviceItems = [
+    { icon: '🏗️', title: lang === 'ar' ? 'التطوير العقاري' : 'Real Estate Development', desc: lang === 'ar' ? 'مشاريع سكنية وتجارية فاخرة' : 'Premium residential & commercial projects', path: '/#services' },
+    { icon: '📋', title: lang === 'ar' ? 'إدارة المشاريع' : 'Project Management', desc: lang === 'ar' ? 'إشراف متكامل على جميع المراحل' : 'End-to-end project oversight', path: '/#services' },
+    { icon: '📈', title: lang === 'ar' ? 'الاستثمار العقاري' : 'Real Estate Investment', desc: lang === 'ar' ? 'فرص استثمارية بعوائد مضمونة' : 'Investment opportunities with guaranteed returns', path: '/#services' },
+    { icon: '🏛️', title: lang === 'ar' ? 'الاستشارات الهندسية' : 'Engineering Consultancy', desc: lang === 'ar' ? 'خبراء هندسيون ومعماريون' : 'Expert architects & engineers', path: '/#services' },
+    { icon: '📣', title: lang === 'ar' ? 'التسويق العقاري' : 'Real Estate Marketing', desc: lang === 'ar' ? 'استراتيجيات تسويقية مبتكرة' : 'Innovative marketing strategies', path: '/#services' },
+    { icon: '🔑', title: lang === 'ar' ? 'إدارة الأصول' : 'Asset Management', desc: lang === 'ar' ? 'صون قيمة محفظتك العقارية' : 'Preserve & grow portfolio', path: '/#services' },
+  ];
+
+  const projectItems = [
+    { title: lang === 'ar' ? 'المشاريع السكنية' : 'Residential Projects', path: '/projects?filter=residential' },
+    { title: lang === 'ar' ? 'المشاريع التجارية' : 'Commercial Projects', path: '/projects?filter=commercial' },
+    { title: lang === 'ar' ? 'المشاريع المتعددة' : 'Mixed-Use Projects', path: '/projects?filter=mixed' },
+    { title: lang === 'ar' ? 'المشاريع قيد التنفيذ' : 'Under Construction', path: '/projects?status=ongoing' },
+    { title: lang === 'ar' ? 'المشاريع المنجزة' : 'Completed Projects', path: '/projects?status=completed' },
+    { title: lang === 'ar' ? 'المشاريع القادمة' : 'Upcoming Projects', path: '/projects?status=upcoming' },
+  ];
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setMegaMenu(null);
+    setUserMenuOpen(false);
+  }, [location]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (megaRef.current && !megaRef.current.contains(e.target as Node)) setMegaMenu(null);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path.split('#')[0]);
 
   const textColor = scrolled
-    ? 'text-dark dark:text-white hover:text-primary dark:hover:text-gold'
-    : 'text-white hover:text-gold';
+    ? 'text-dark dark:text-white hover:text-gold dark:hover:text-gold'
+    : 'text-white/90 hover:text-gold';
+  const activeColor = 'text-gold font-semibold';
 
-  const activeColor = scrolled ? 'text-primary dark:text-gold' : 'text-gold';
+  const handleLogout = async () => {
+    setUserMenuOpen(false);
+    setMobileOpen(false);
+    await signOut();
+    navigate('/');
+  };
+
+  const roleLabel: Record<string, string> = {
+    admin: lang === 'ar' ? 'مدير النظام' : 'Admin',
+    editor: lang === 'ar' ? 'محرر' : 'Editor',
+    investor: lang === 'ar' ? 'مستثمر' : 'Investor',
+    customer: lang === 'ar' ? 'عميل' : 'Customer',
+  };
 
   return (
     <>
@@ -83,7 +140,7 @@ export default function Navbar() {
       <AnimatePresence>
         {megaMenu && (
           <motion.div
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -93,48 +150,46 @@ export default function Navbar() {
       </AnimatePresence>
 
       <header
+        ref={megaRef}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'bg-white/95 dark:bg-dark-100/95 backdrop-blur-md shadow-luxury py-2'
-            : 'bg-transparent py-4'
+            ? 'bg-white/95 dark:bg-black/90 backdrop-blur-2xl shadow-2xl border-b border-gold/15 py-3'
+            : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-5'
         }`}
-        ref={megaRef}
       >
-        <div className="container-custom flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 flex-shrink-0">
+        <div className="container-custom flex items-center justify-between gap-6">
+          {/* Brand Logo - 30% Prominent */}
+          <Link to="/" className="flex items-center gap-3 flex-shrink-0 group">
             <img
               src="/logo.png"
               alt="AL HISHAM DEVELOPMENT"
-              className={`h-20 lg:h-28 w-auto object-contain transition-all duration-300 ${
+              className={`h-20 sm:h-24 lg:h-[110px] w-auto object-contain transition-all duration-300 ${
                 (!scrolled || isDark) ? 'brightness-0 invert' : ''
-              }`}
+              } group-hover:scale-105`}
             />
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-0.5">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map(({ key, path, hasMega }) => (
-              <div key={key} className="relative">
+              <div key={path} className="relative">
                 {hasMega ? (
                   <button
                     onMouseEnter={() => setMegaMenu(hasMega)}
-                    className={`nav-link px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center gap-1 ${
+                    aria-label={t(key)}
+                    className={`nav-link px-3.5 py-2 text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200 flex items-center gap-1 ${
                       isActive(path) ? activeColor : textColor
                     }`}
                   >
                     {t(key)}
-                    <svg
-                      className={`w-3 h-3 transition-transform duration-200 ${megaMenu === hasMega ? 'rotate-180' : ''}`}
-                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <FiChevronDown
+                      className={`w-3 h-3 transition-transform duration-200 ${megaMenu === hasMega ? 'rotate-180 text-gold' : ''}`}
+                    />
                   </button>
                 ) : (
                   <Link
                     to={path}
-                    className={`nav-link px-4 py-2 text-sm font-medium transition-all duration-200 block ${
+                    className={`nav-link px-3.5 py-2 text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200 block ${
                       isActive(path) ? activeColor : textColor
                     }`}
                   >
@@ -145,60 +200,151 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Actions */}
+          {/* Desktop Action Controls */}
           <div className="hidden lg:flex items-center gap-3">
-            {/* Lang Toggle */}
+
+            {/* Language Toggle */}
             <button
               onClick={toggleLang}
-              className={`px-3 py-1.5 text-xs font-semibold border rounded-sm tracking-widest transition-all duration-200 ${
+              title={lang === 'ar' ? 'Switch to English' : 'التحويل للغة العربية'}
+              aria-label="Toggle language"
+              className={`px-3 py-1.5 rounded-none text-xs font-bold tracking-widest transition-all duration-200 flex items-center gap-1.5 border ${
                 scrolled
-                  ? 'border-primary text-primary dark:border-gold dark:text-gold hover:bg-primary hover:text-white dark:hover:bg-gold dark:hover:text-dark'
-                  : 'border-white/70 text-white hover:bg-white/10'
+                  ? 'border-gray-200 dark:border-gray-800 text-dark dark:text-white hover:border-gold hover:text-gold'
+                  : 'border-white/30 text-white hover:border-gold hover:text-gold'
               }`}
             >
-              {lang === 'ar' ? 'EN' : 'عر'}
+              <FiGlobe className="w-3.5 h-3.5 text-gold" />
+              <span>{lang === 'ar' ? 'EN' : 'عربي'}</span>
             </button>
 
-            {/* Theme Toggle */}
+            {/* Dark/Light Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className={`w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 ${
+              aria-label={isDark ? 'Light Mode' : 'Dark Mode'}
+              className={`w-9 h-9 flex items-center justify-center transition-all duration-200 ${
                 scrolled
-                  ? 'bg-surface dark:bg-dark-300 hover:bg-primary/10 dark:hover:bg-gold/10'
-                  : 'bg-white/10 hover:bg-white/20'
+                  ? 'bg-gray-100 dark:bg-gray-900 hover:bg-gold/10 text-dark dark:text-white'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
               }`}
-              aria-label="Toggle theme"
             >
-              {isDark ? (
-                <svg className="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />
-                </svg>
-              ) : (
-                <svg className={`w-4 h-4 ${scrolled ? 'text-dark dark:text-white' : 'text-white'}`} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                </svg>
-              )}
+              {isDark
+                ? <FiSun className="w-4 h-4 text-gold" />
+                : <FiMoon className={`w-4 h-4 ${scrolled ? 'text-dark dark:text-white' : 'text-white'}`} />
+              }
             </button>
 
-            {/* WhatsApp CTA */}
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن خدمات الهشام للتطوير العقاري')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary !py-2.5 !px-5 !text-xs"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              واتساب
-            </a>
+            {/* Auth State Control */}
+            {loading ? (
+              <div className="w-8 h-8 rounded-full bg-white/20 animate-pulse" />
+            ) : isLoggedIn && profile ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  aria-label="Account menu"
+                  className={`flex items-center gap-2 px-2.5 py-1 transition-all border ${
+                    scrolled
+                      ? 'border-gray-200 dark:border-gray-800 hover:border-gold'
+                      : 'border-white/30 hover:border-gold'
+                  }`}
+                >
+                  <AvatarDisplay avatarUrl={profile.avatar_url} fullName={profile.full_name} size="sm" />
+                  <span className={`text-xs font-bold uppercase tracking-wider hidden xl:block ${scrolled ? 'text-dark dark:text-white' : 'text-white'}`}>
+                    {profile.full_name?.split(' ')[0] || (lang === 'ar' ? 'حسابي' : 'Account')}
+                  </span>
+                  <FiChevronDown
+                    className={`w-3.5 h-3.5 transition-transform ${userMenuOpen ? 'rotate-180 text-gold' : ''} ${scrolled ? 'text-dark dark:text-white' : 'text-white'}`}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-60 bg-white dark:bg-black rounded-none shadow-2xl border border-gold/20 overflow-hidden z-50`}
+                    >
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800/80 bg-gold/5">
+                        <div className="flex items-center gap-3">
+                          <AvatarDisplay avatarUrl={profile.avatar_url} fullName={profile.full_name} />
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-dark dark:text-white truncate">{profile.full_name}</p>
+                            <p className="text-xs text-gray-400 truncate">{profile.email}</p>
+                          </div>
+                        </div>
+                        <span className="mt-2 inline-block text-[10px] uppercase tracking-wider px-2 py-0.5 bg-gold/15 text-gold border border-gold/30 font-semibold">
+                          {roleLabel[profile.role] || profile.role}
+                        </span>
+                      </div>
+
+                      <div className="py-1">
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors"
+                        >
+                          <FiUser className="w-4 h-4 text-gold" /> {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
+                        </Link>
+                        {(profile.role === 'admin' || profile.role === 'editor') && (
+                          <Link
+                            to="/admin"
+                            className="flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors font-bold text-gold"
+                          >
+                            <FiShield className="w-4 h-4" /> {lang === 'ar' ? 'لوحة التحكم' : 'Admin Dashboard'}
+                          </Link>
+                        )}
+                        {profile.role === 'investor' && (
+                          <Link
+                            to="/investor"
+                            className="flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors"
+                          >
+                            <FiBarChart2 className="w-4 h-4 text-gold" /> {lang === 'ar' ? 'لوحة المستثمر' : 'Investor Dashboard'}
+                          </Link>
+                        )}
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gold/10 hover:text-gold transition-colors"
+                        >
+                          <FiSettings className="w-4 h-4 text-gold" /> {lang === 'ar' ? 'الإعدادات' : 'Settings'}
+                        </Link>
+                      </div>
+
+                      <div className="border-t border-gray-100 dark:border-gray-800 py-1">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-xs uppercase tracking-wider text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <FiLogOut className="w-4 h-4" /> {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="btn-outline !py-2 !px-4 !text-xs"
+                >
+                  {lang === 'ar' ? 'تسجيل الدخول' : 'Login'}
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn-gold !py-2 !px-4 !text-xs"
+                >
+                  {lang === 'ar' ? 'حساب جديد' : 'Register'}
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Mobile Hamburger */}
+          {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
             aria-label="Toggle menu"
+            className="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 flex-shrink-0"
           >
             <span className={`block h-0.5 transition-all duration-300 ${scrolled ? 'bg-dark dark:bg-white' : 'bg-white'} ${mobileOpen ? 'w-6 rotate-45 translate-y-2' : 'w-6'}`} />
             <span className={`block h-0.5 transition-all duration-300 ${scrolled ? 'bg-dark dark:bg-white' : 'bg-white'} ${mobileOpen ? 'opacity-0 w-0' : 'w-5'}`} />
@@ -206,11 +352,11 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mega Menu — Services */}
+        {/* Mega Menu - Services */}
         <AnimatePresence>
           {megaMenu === 'services' && (
             <motion.div
-              className="absolute left-0 right-0 top-full bg-white/95 dark:bg-dark-100/95 backdrop-blur-xl shadow-luxury-dark border-t border-gold/20"
+              className="absolute left-0 right-0 top-full bg-black/95 backdrop-blur-2xl shadow-2xl border-t border-gold/30 text-white"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -220,20 +366,22 @@ export default function Navbar() {
               <div className="container-custom py-8">
                 <div className="flex items-center gap-3 mb-6">
                   <span className="w-8 h-px bg-gold" />
-                  <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">خدماتنا المتكاملة</p>
+                  <p className="text-gold text-xs font-bold tracking-[0.3em] uppercase">
+                    {lang === 'ar' ? 'خدماتنا الفاخرة' : 'Luxury Services'}
+                  </p>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
-                  {serviceItems.map((item) => (
+                  {serviceItems.map(item => (
                     <Link
                       key={item.title}
                       to={item.path}
-                      className="flex gap-4 p-4 rounded-sm hover:bg-primary/5 dark:hover:bg-gold/5 transition-colors group"
+                      className="flex gap-4 p-4 hover:bg-gold/10 transition-colors group border border-white/5 hover:border-gold/30"
                       onClick={() => setMegaMenu(null)}
                     >
                       <span className="text-2xl">{item.icon}</span>
                       <div>
-                        <p className="font-semibold text-dark dark:text-white text-sm group-hover:text-primary dark:group-hover:text-gold transition-colors">{item.title}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{item.desc}</p>
+                        <p className="font-bold text-white text-sm group-hover:text-gold transition-colors">{item.title}</p>
+                        <p className="text-gray-400 text-xs mt-1 leading-relaxed">{item.desc}</p>
                       </div>
                     </Link>
                   ))}
@@ -243,11 +391,11 @@ export default function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* Mega Menu — Projects */}
+        {/* Mega Menu - Projects */}
         <AnimatePresence>
           {megaMenu === 'projects' && (
             <motion.div
-              className="absolute left-0 right-0 top-full bg-white/95 dark:bg-dark-100/95 backdrop-blur-xl shadow-luxury-dark border-t border-gold/20"
+              className="absolute left-0 right-0 top-full bg-black/95 backdrop-blur-2xl shadow-2xl border-t border-gold/30 text-white"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -259,33 +407,41 @@ export default function Navbar() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-5">
                       <span className="w-8 h-px bg-gold" />
-                      <p className="text-gold text-xs font-semibold tracking-[0.3em] uppercase">تصفح المشاريع</p>
+                      <p className="text-gold text-xs font-bold tracking-[0.3em] uppercase">
+                        {lang === 'ar' ? 'تصفح المشاريع' : 'Browse Portfolio'}
+                      </p>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {projectItems.map((item) => (
+                    <div className="grid grid-cols-2 gap-3">
+                      {projectItems.map(item => (
                         <Link
                           key={item.title}
                           to={item.path}
-                          className="flex items-center gap-2 px-4 py-3 hover:bg-primary/5 dark:hover:bg-gold/5 transition-colors group rounded-sm"
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-gold/10 transition-colors group border border-white/5 hover:border-gold/30"
                           onClick={() => setMegaMenu(null)}
                         >
-                          <span className="w-1 h-1 rounded-full bg-gold group-hover:w-3 transition-all" />
-                          <span className="text-sm text-dark dark:text-white group-hover:text-primary dark:group-hover:text-gold transition-colors">{item.title}</span>
+                          <span className="w-1.5 h-1.5 bg-gold group-hover:w-4 transition-all" />
+                          <span className="text-sm font-semibold text-white group-hover:text-gold transition-colors">{item.title}</span>
                         </Link>
                       ))}
                     </div>
                   </div>
-                  <div className="w-64 bg-primary/5 dark:bg-gold/5 p-6 rounded-sm">
-                    <p className="text-dark dark:text-white font-bold mb-2 text-sm">هل تبحث عن عقار مثالي؟</p>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-4 leading-relaxed">تحدث مع فريقنا المتخصص للحصول على استشارة مجانية.</p>
+                  <div className="w-72 bg-gold/10 border border-gold/25 p-6 flex flex-col justify-between">
+                    <div>
+                      <p className="text-white font-bold mb-2 text-sm uppercase tracking-wider">
+                        {lang === 'ar' ? 'استشارة عقارية فاخرة' : 'Luxury Real Estate Consultation'}
+                      </p>
+                      <p className="text-gray-400 text-xs leading-relaxed mb-4">
+                        {lang === 'ar' ? 'تحدث مع خبراء الاستثمار والتطوير العقاري في الهشام.' : 'Speak directly with Al Hisham real estate development advisors.'}
+                      </p>
+                    </div>
                     <a
                       href={`https://wa.me/${WHATSAPP_NUMBER}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-gold !py-2 !px-4 !text-xs w-full justify-center"
+                      className="btn-gold !py-2.5 !px-4 !text-xs justify-center"
                       onClick={() => setMegaMenu(null)}
                     >
-                      استشارة مجانية
+                      {lang === 'ar' ? 'تواصل معنا' : 'Contact Us'}
                     </a>
                   </div>
                 </div>
@@ -295,86 +451,141 @@ export default function Navbar() {
         </AnimatePresence>
       </header>
 
-      {/* Mobile Menu */}
-      <div
-        className={`fixed inset-0 z-40 lg:hidden transition-all duration-500 ${
-          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        {/* Overlay */}
-        <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
-        {/* Drawer */}
-        <div
-          className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} h-full w-80 bg-white dark:bg-dark-100 shadow-2xl transition-transform duration-500 flex flex-col ${
-            mobileOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
-          }`}
-        >
-          {/* Mobile Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-dark-300">
-            <img
-              src="/logo.png"
-              alt="AL HISHAM"
-              className={`h-16 w-auto object-contain ${isDark ? 'brightness-0 invert' : ''}`}
-            />
-            <button
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md lg:hidden"
               onClick={() => setMobileOpen(false)}
-              className="w-8 h-8 flex items-center justify-center text-dark dark:text-white"
-            >
-              ✕
-            </button>
-          </div>
+            />
 
-          {/* Mobile Links */}
-          <nav className="flex-1 overflow-y-auto p-6 flex flex-col gap-1">
-            {navLinks.map(({ key, path }, i) => (
-              <Link
-                key={key}
-                to={path}
-                style={{ animationDelay: `${i * 60}ms` }}
-                className={`px-4 py-3 text-base font-medium border-b border-gray-50 dark:border-dark-300 transition-colors ${
-                  isActive(path)
-                    ? 'text-primary dark:text-gold'
-                    : 'text-dark dark:text-white hover:text-primary dark:hover:text-gold'
-                }`}
-              >
-                {t(key)}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Mobile Footer Actions */}
-          <div className="p-6 flex flex-col gap-3 border-t border-gray-100 dark:border-dark-300">
-            <div className="flex gap-3">
-              <button
-                onClick={toggleLang}
-                className="flex-1 py-2 text-sm font-semibold border border-primary text-primary dark:border-gold dark:text-gold rounded-sm"
-              >
-                {lang === 'ar' ? 'English' : 'العربية'}
-              </button>
-              <button
-                onClick={toggleTheme}
-                className="flex-1 py-2 text-sm font-semibold bg-surface dark:bg-dark-300 rounded-sm"
-              >
-                {isDark ? '☀️ فاتح' : '🌙 داكن'}
-              </button>
-            </div>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary w-full justify-center"
+            <motion.div
+              initial={{ x: isRTL ? '100%' : '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: isRTL ? '100%' : '-100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              className={`fixed top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-80 max-w-[90vw] bg-black text-white border-l border-gold/20 shadow-2xl flex flex-col lg:hidden`}
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              واتساب
-            </a>
-          </div>
-        </div>
-      </div>
+              <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+                <img
+                  src="/logo.png"
+                  alt="AL HISHAM"
+                  className="h-12 w-auto object-contain brightness-0 invert"
+                />
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="w-9 h-9 flex items-center justify-center rounded-none bg-white/10 text-white"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
+              </div>
+
+              {isLoggedIn && profile && (
+                <div className="px-6 py-4 bg-gold/10 border-b border-gold/20">
+                  <div className="flex items-center gap-3">
+                    <AvatarDisplay avatarUrl={profile.avatar_url} fullName={profile.full_name} />
+                    <div className="min-w-0">
+                      <p className="font-bold text-white text-sm truncate">{profile.full_name}</p>
+                      <p className="text-xs text-gray-400 truncate">{profile.email}</p>
+                    </div>
+                  </div>
+                  <span className="mt-2 inline-block text-[10px] uppercase tracking-wider px-2 py-0.5 bg-gold/20 text-gold border border-gold/40">
+                    {roleLabel[profile.role] || profile.role}
+                  </span>
+                </div>
+              )}
+
+              <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+                {navLinks.map(({ key, path }) => (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`flex items-center px-4 py-3 text-xs uppercase tracking-widest font-semibold transition-colors ${
+                      isActive(path)
+                        ? 'text-gold bg-gold/10 border-l-2 border-gold'
+                        : 'text-gray-300 hover:text-gold'
+                    }`}
+                  >
+                    {t(key)}
+                  </Link>
+                ))}
+
+                {/* Logged-in links below nav */}
+                {isLoggedIn && profile && (
+                  <>
+                    <div className="my-3 border-t border-white/10" />
+                    <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest text-white hover:text-gold">
+                      <FiUser className="w-4 h-4 text-gold" /> Profile
+                    </Link>
+                    {(profile.role === 'admin' || profile.role === 'editor') && (
+                      <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest text-gold font-bold">
+                        <FiShield className="w-4 h-4" /> Admin Dashboard
+                      </Link>
+                    )}
+                    {profile.role === 'investor' && (
+                      <Link to="/investor" className="flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest text-white hover:text-gold">
+                        <FiBarChart2 className="w-4 h-4 text-gold" /> Investor Dashboard
+                      </Link>
+                    )}
+                  </>
+                )}
+              </nav>
+
+              <div className="px-5 pb-6 border-t border-white/10 space-y-3 pt-4">
+
+                {/* Login / Register — only when LOGGED OUT */}
+                {!isLoggedIn && !loading && (
+                  <div className="flex gap-2 mb-2">
+                    <Link
+                      to="/login"
+                      className="btn-outline flex-1 justify-center !py-2.5 !px-2"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="btn-gold flex-1 justify-center !py-2.5 !px-2"
+                    >
+                      Register
+                    </Link>
+                  </div>
+                )}
+
+                {/* Logout — only when LOGGED IN */}
+                {isLoggedIn && (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-xs uppercase tracking-wider font-semibold text-red-400 border border-red-900/40 bg-red-950/20 hover:bg-red-900/40 transition-colors mb-2"
+                  >
+                    <FiLogOut className="w-4 h-4" /> Logout
+                  </button>
+                )}
+
+                {/* Utility Row: Lang + Theme */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={toggleLang}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold bg-white/5 border border-white/10 text-white"
+                  >
+                    <FiGlobe className="w-3.5 h-3.5 text-gold" />
+                    <span>{lang === 'ar' ? 'English' : 'العربية'}</span>
+                  </button>
+                  <button
+                    onClick={toggleTheme}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold bg-white/5 border border-white/10 text-white"
+                  >
+                    {isDark ? <><FiSun className="w-3.5 h-3.5 text-gold" /> Light</> : <><FiMoon className="w-3.5 h-3.5" /> Dark</>}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

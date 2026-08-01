@@ -2,16 +2,11 @@ import React from 'react';
 import SEO from '../components/ui/SEO';
 import HeroSection from '../components/sections/HeroSection';
 import StatsSection from '../components/sections/StatsSection';
-import FeaturesSection from '../components/sections/FeaturesSection';
-import AboutSection from '../components/sections/AboutSection';
-import TimelineSection from '../components/sections/TimelineSection';
-import ServicesSection from '../components/sections/ServicesSection';
 import ProjectsSection from '../components/sections/ProjectsSection';
-import BeforeAfterSection from '../components/sections/BeforeAfterSection';
-import PartnersSection from '../components/sections/PartnersSection';
-import TestimonialsSection from '../components/sections/TestimonialsSection';
+import AboutSection from '../components/sections/AboutSection';
+import ServicesSection from '../components/sections/ServicesSection';
+import InvestmentSection from '../components/sections/InvestmentSection';
 import BlogSection from '../components/sections/BlogSection';
-import FAQSection from '../components/sections/FAQSection';
 import CTASection from '../components/sections/CTASection';
 
 export default function Home() {
@@ -23,16 +18,11 @@ export default function Home() {
       />
       <HeroSection />
       <StatsSection />
-      <FeaturesSection />
-      <AboutSection />
-      <TimelineSection />
-      <ServicesSection />
       <ProjectsSection />
-      <BeforeAfterSection />
-      <PartnersSection />
-      <TestimonialsSection />
+      <AboutSection />
+      <ServicesSection />
+      <InvestmentSection />
       <BlogSection />
-      <FAQSection />
       <CTASection />
     </>
   );

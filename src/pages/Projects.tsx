@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import SEO from '../components/ui/SEO';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '../context/LanguageContext';
-import { projects } from '../data';
+import { projectsService } from '../services/projects';
+import type { Project } from '../services/projects';
 import FadeIn from '../components/ui/FadeIn';
 
 type Category = 'all' | 'residential' | 'commercial' | 'mixed';
@@ -12,8 +13,10 @@ type Status = 'all' | 'completed' | 'ongoing' | 'upcoming';
 
 const statusColors: Record<string, string> = {
   completed: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-  ongoing: 'bg-gold/10 text-gold border-gold/30',
+  under_construction: 'bg-gold/10 text-gold border-gold/30',
   upcoming: 'bg-blue-500/10 text-blue-600 border-blue-500/30',
+  planning: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
+  sold_out: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 export default function Projects() {
@@ -24,10 +27,22 @@ export default function Projects() {
   const initialFilter = (searchParams.get('filter') as Category) || 'all';
   const initialStatus = (searchParams.get('status') as Status) || 'all';
 
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Category>(initialFilter);
   const [statusFilter, setStatusFilter] = useState<Status>(initialStatus);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  useEffect(() => {
+    projectsService.getProjects({ publishedOnly: true }).then(data => {
+      setProjects(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, []);
 
   const categoryFilters: { key: Category; label: string }[] = [
     { key: 'all', label: t('projects.filter_all') },
@@ -46,19 +61,22 @@ export default function Projects() {
   const filtered = useMemo(() => {
     return projects.filter(p => {
       const matchCategory = filter === 'all' || p.category === filter;
-      const matchStatus = statusFilter === 'all' || p.status === statusFilter;
+      const matchStatus = statusFilter === 'all' || 
+        (statusFilter === 'ongoing' && p.status === 'under_construction') ||
+        (statusFilter === 'completed' && p.status === 'completed') ||
+        (statusFilter === 'upcoming' && (p.status === 'upcoming' || p.status === 'planning'));
       const matchSearch = search.trim() === '' ||
-        p.titleAr.toLowerCase().includes(search.toLowerCase()) ||
-        p.titleEn.toLowerCase().includes(search.toLowerCase()) ||
-        p.locationAr.toLowerCase().includes(search.toLowerCase()) ||
-        p.locationEn.toLowerCase().includes(search.toLowerCase());
+        (p.title_ar && p.title_ar.toLowerCase().includes(search.toLowerCase())) ||
+        (p.title_en && p.title_en.toLowerCase().includes(search.toLowerCase())) ||
+        (p.location_ar && p.location_ar.toLowerCase().includes(search.toLowerCase())) ||
+        (p.location_en && p.location_en.toLowerCase().includes(search.toLowerCase()));
       return matchCategory && matchStatus && matchSearch;
     });
-  }, [filter, statusFilter, search]);
+  }, [projects, filter, statusFilter, search]);
 
   const getStatusLabel = (s: string) => {
-    if (s === 'completed') return t('projects.status_completed');
-    if (s === 'ongoing') return t('projects.status_ongoing');
+    if (s === 'completed' || s === 'sold_out') return t('projects.status_completed');
+    if (s === 'under_construction') return t('projects.status_ongoing');
     return t('projects.status_upcoming');
   };
 
@@ -227,8 +245,8 @@ export default function Projects() {
                       <Link to={`/projects/${project.id}`} className="group card-luxury block h-full">
                         <div className="relative overflow-hidden h-64">
                           <img
-                            src={project.image}
-                            alt={lang === 'ar' ? project.titleAr : project.titleEn}
+                            src={project.cover_image || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80'}
+                            alt={lang === 'ar' ? project.title_ar : project.title_en}
                             loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                           />
@@ -242,14 +260,14 @@ export default function Projects() {
                         </div>
                         <div className="p-6">
                           <h3 className="font-bold text-lg text-dark dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-gold transition-colors">
-                            {lang === 'ar' ? project.titleAr : project.titleEn}
+                            {lang === 'ar' ? project.title_ar : project.title_en}
                           </h3>
                           <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
                             <span className="flex items-center gap-1">
                               <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               </svg>
-                              {lang === 'ar' ? project.locationAr : project.locationEn}
+                              {lang === 'ar' ? project.location_ar : project.location_en}
                             </span>
                             <span className="flex items-center gap-1">
                               <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +276,7 @@ export default function Projects() {
                               {project.year}
                             </span>
                           </div>
-                          {project.status === 'ongoing' && (
+                          {project.status === 'under_construction' && (
                             <div className="mb-4">
                               <div className="flex justify-between text-xs text-gray-500 mb-1">
                                 <span>{lang === 'ar' ? 'نسبة الإنجاز' : 'Progress'}</span>
@@ -289,8 +307,8 @@ export default function Projects() {
                       <Link to={`/projects/${project.id}`} className="group flex gap-6 bg-white dark:bg-dark-300 shadow-sm hover:shadow-luxury transition-all border border-gray-100 dark:border-dark-400">
                         <div className="relative w-48 h-36 flex-shrink-0 overflow-hidden">
                           <img
-                            src={project.image}
-                            alt={lang === 'ar' ? project.titleAr : project.titleEn}
+                            src={project.cover_image || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80'}
+                            alt={lang === 'ar' ? project.title_ar : project.title_en}
                             loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
@@ -300,19 +318,19 @@ export default function Projects() {
                         </div>
                         <div className="flex-1 py-4 pr-4 rtl:pl-4 rtl:pr-0">
                           <h3 className="font-bold text-lg text-dark dark:text-white mb-1 group-hover:text-primary dark:group-hover:text-gold transition-colors">
-                            {lang === 'ar' ? project.titleAr : project.titleEn}
+                            {lang === 'ar' ? project.title_ar : project.title_en}
                           </h3>
                           <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 flex items-center gap-1">
                             <svg className="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             </svg>
-                            {lang === 'ar' ? project.locationAr : project.locationEn}
+                            {lang === 'ar' ? project.location_ar : project.location_en}
                             <span className="mx-2 text-gray-300">·</span>
                             {project.year}
                             <span className="mx-2 text-gray-300">·</span>
                             {project.area} م²
                           </p>
-                          {project.status === 'ongoing' && (
+                          {project.status === 'under_construction' && (
                             <div className="max-w-xs">
                               <div className="flex justify-between text-xs text-gray-500 mb-1">
                                 <span>{lang === 'ar' ? 'نسبة الإنجاز' : 'Progress'}</span>

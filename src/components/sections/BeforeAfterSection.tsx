@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const beforeImg = 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80';
+const beforeImg = 'https://images.unsplash.com/photo-1541888086425-d81bb19240f5?w=1200&q=80';
 const afterImg = 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80';
 
 export default function BeforeAfterSection() {

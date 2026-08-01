@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -10,23 +10,40 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
 import { useLang } from '../context/LanguageContext';
-import { projects } from '../data';
+import { projectsService } from '../services/projects';
+import type { Project } from '../services/projects';
 import SEO from '../components/ui/SEO';
 
 const WHATSAPP = '201103657888';
 
 export default function ProjectDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const { t } = useTranslation();
   const { lang } = useLang();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', phone: '', message: '' });
+  const [project, setProject] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const project = projects.find(p => p.id === id);
+  useEffect(() => {
+    if (!slug) return;
+    projectsService.getProjectBySlug(slug)
+      .then(data => {
+        setProject(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        navigate('/projects');
+      });
+  }, [slug, navigate]);
+
+  if (loading) return <div className="min-h-screen pt-32 flex justify-center items-center">جاري التحميل...</div>;
   if (!project) return <Navigate to="/projects" />;
 
-  const title = lang === 'ar' ? project.titleAr : project.titleEn;
-  const location = lang === 'ar' ? project.locationAr : project.locationEn;
-  const description = lang === 'ar' ? project.descriptionAr : project.descriptionEn;
+  const title = lang === 'ar' ? project.title_ar : project.title_en;
+  const location = lang === 'ar' ? project.location_ar : project.location_en;
+  const description = lang === 'ar' ? project.description_ar : project.description_en;
 
   const sendToWhatsApp = () => {
     const msg = encodeURIComponent(
@@ -37,9 +54,14 @@ export default function ProjectDetail() {
 
   const statusColors: Record<string, string> = {
     completed: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-    ongoing: 'bg-gold/10 text-gold border-gold/30',
+    under_construction: 'bg-gold/10 text-gold border-gold/30',
     upcoming: 'bg-blue-500/10 text-blue-600 border-blue-500/30',
+    sold_out: 'bg-red-500/10 text-red-600 border-red-500/30',
+    planning: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
   };
+
+  const images = project.project_images?.length > 0 ? project.project_images.map((img: any) => img.image_url) : [project.cover_image || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80'];
+
 
   return (
     <>
@@ -60,7 +82,7 @@ export default function ProjectDetail() {
           loop
           className="w-full h-full"
         >
-          {project.images.map((img, i) => (
+          {images.map((img: string, i: number) => (
             <SwiperSlide key={i}>
               <div className="relative w-full h-full">
                 <img src={img} alt={`${title} - ${i + 1}`} className="w-full h-full object-cover" />
@@ -120,7 +142,7 @@ export default function ProjectDetail() {
               </motion.div>
 
               {/* Progress */}
-              {project.status === 'ongoing' && (
+              {project.status === 'under_construction' && (
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <div className="bg-white dark:bg-dark-200 p-8 rounded-sm premium-shadow dark:premium-shadow-dark border border-gray-100 dark:border-dark-300">
                     <h3 className="font-bold text-dark dark:text-white mb-4 text-xl">
@@ -149,28 +171,28 @@ export default function ProjectDetail() {
                   {lang === 'ar' ? 'المميزات والخدمات' : 'Features & Amenities'}
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {project.features.map((feature, idx) => (
+                  {project.project_features?.map((featureObj: any, idx: number) => (
                     <div key={idx} className="flex items-center gap-4 p-4 bg-white dark:bg-dark-200 premium-shadow dark:premium-shadow-dark border border-gray-100 dark:border-dark-300 rounded-sm hover:-translate-y-1 transition-transform">
                       <div className="w-10 h-10 bg-primary/10 dark:bg-gold/10 rounded-full flex items-center justify-center flex-shrink-0">
                         <svg className="w-5 h-5 text-primary dark:text-gold" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <span className="text-dark dark:text-white font-medium">{feature}</span>
+                      <span className="text-dark dark:text-white font-medium">{lang === 'ar' ? featureObj.name_ar : featureObj.name_en}</span>
                     </div>
                   ))}
                 </div>
               </motion.div>
 
               {/* Map */}
-              {project.mapEmbedUrl && (
+              {project.map_embed_url && (
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <h3 className="text-2xl font-bold text-dark dark:text-white mb-6">
                     {lang === 'ar' ? 'موقع المشروع' : 'Project Location'}
                   </h3>
                   <div className="h-96 overflow-hidden rounded-sm premium-shadow dark:premium-shadow-dark border border-gray-100 dark:border-dark-300">
                     <iframe
-                      src={project.mapEmbedUrl}
+                      src={project.map_embed_url}
                       width="100%"
                       height="100%"
                       style={{ border: 0, filter: 'grayscale(15%) contrast(1.1)' }}

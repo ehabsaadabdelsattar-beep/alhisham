@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Disallow private & admin routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /investor
+Disallow: /reset-password
+
+# Allow search engines to crawl public assets
+Allow: /logo.png
+Allow: /favicon.ico
+Allow: /sitemap.xml
+
+# Sitemap
+Sitemap: https://alhisham.vercel.app/sitemap.xml

@@ -10,65 +10,64 @@ export default function BlogSection() {
   const posts = blogPosts.slice(0, 3);
 
   const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric', month: 'long', day: 'numeric',
+    new Date(dateStr).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {
+      year: 'numeric', month: 'short', day: 'numeric',
     });
 
   return (
-    <section className="section-padding bg-surface dark:bg-dark-200">
+    <section className="section-padding bg-surface dark:bg-black border-t border-gray-100 dark:border-gray-800">
       <div className="container-custom">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
-            <p className="section-subtitle">{t('blog.subtitle')}</p>
-            <h2 className="section-title text-dark dark:text-white">{t('blog.title')}</h2>
+            <span className="section-subtitle">{t('blog.subtitle')}</span>
+            <h2 className="section-title text-dark dark:text-white">
+              {lang === 'ar' ? 'أحدث مقالاتنا ورؤانا المعمارية' : 'Architectural Insights & News'}
+            </h2>
             <div className="gold-divider" />
           </div>
-          <Link to="/blog" className="btn-outline-primary flex-shrink-0 self-start">
-            {t('blog.view_all')}
+          <Link to="/blog" className="btn-outline-gold !px-6 !py-3">
+            <span>{t('blog.view_all')}</span>
             <svg className="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {posts.map((post) => (
+        {/* Editorial Blog Grid */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {posts.map((post, i) => (
             <Link
               key={post.id}
               to={`/blog/${post.id}`}
-              className="group card-luxury block"
+              className="group card-luxury block border border-gray-100 dark:border-gray-800/80 hover:border-gold/40 transition-all duration-500"
             >
-              <div className="relative overflow-hidden h-52">
+              <div className="relative overflow-hidden h-60">
                 <img
                   src={post.image}
                   alt={lang === 'ar' ? post.titleAr : post.titleEn}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="overlay-gradient" />
-                <span className="absolute bottom-4 right-4 rtl:left-4 rtl:right-auto bg-gold text-dark text-xs font-bold px-3 py-1">
+                <span className="absolute bottom-4 right-4 rtl:left-4 rtl:right-auto bg-gold text-dark text-[10px] font-bold uppercase tracking-widest px-3 py-1">
                   {lang === 'ar' ? post.categoryAr : post.categoryEn}
                 </span>
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
-                  <span className="flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {formatDate(post.date)}
-                  </span>
+                  <span>{formatDate(post.date)}</span>
                   <span>•</span>
                   <span>{post.readTime} {lang === 'ar' ? 'دقائق قراءة' : 'min read'}</span>
                 </div>
-                <h3 className="font-bold text-dark dark:text-white mb-3 leading-snug group-hover:text-primary dark:group-hover:text-gold transition-colors line-clamp-2">
+                <h3 className="font-bold text-lg text-dark dark:text-white mb-3 leading-snug group-hover:text-gold transition-colors line-clamp-2">
                   {lang === 'ar' ? post.titleAr : post.titleEn}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-3 mb-4">
+                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-3 mb-6 font-light">
                   {lang === 'ar' ? post.summaryAr : post.summaryEn}
                 </p>
-                <div className="flex items-center gap-2 text-primary dark:text-gold text-sm font-semibold group-hover:gap-3 transition-all duration-200">
-                  {t('blog.read_more')}
+                <div className="flex items-center gap-2 text-gold text-xs font-bold tracking-widest uppercase group-hover:gap-3 transition-all duration-200">
+                  <span>{t('blog.read_more')}</span>
                   <svg className="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>

@@ -242,7 +242,7 @@ export default function Projects() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: i * 0.08 }}
                     >
-                      <Link to={`/projects/${project.id}`} className="group card-luxury block h-full">
+                      <Link to={`/projects/${project.slug || project.id}`} className="group card-luxury block h-full">
                         <div className="relative overflow-hidden h-64">
                           <img
                             src={project.cover_image || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80'}
@@ -304,7 +304,7 @@ export default function Projects() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: i * 0.05 }}
                     >
-                      <Link to={`/projects/${project.id}`} className="group flex gap-6 bg-white dark:bg-dark-300 shadow-sm hover:shadow-luxury transition-all border border-gray-100 dark:border-dark-400">
+                      <Link to={`/projects/${project.slug || project.id}`} className="group flex gap-6 bg-white dark:bg-dark-300 shadow-sm hover:shadow-luxury transition-all border border-gray-100 dark:border-dark-400">
                         <div className="relative w-48 h-36 flex-shrink-0 overflow-hidden">
                           <img
                             src={project.cover_image || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80'}

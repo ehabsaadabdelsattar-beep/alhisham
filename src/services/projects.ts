@@ -60,13 +60,23 @@ export const projectsService = {
   },
 
   async getProjectBySlug(slug: string) {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('projects')
       .select('*, project_images(*), project_updates(*)')
       .eq('slug', slug)
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (!data) {
+      const { data: dataById } = await supabase
+        .from('projects')
+        .select('*, project_images(*), project_updates(*)')
+        .eq('id', slug)
+        .maybeSingle();
+
+      if (dataById) data = dataById;
+    }
+
+    if (!data) throw new Error('Project not found');
     return data;
   },
 

@@ -6,37 +6,37 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#1B4332',
-          light: '#2D6A4F',
-          lighter: '#40916C',
-          dark: '#0D2818',
+          DEFAULT: '#103C32',
+          light: '#174B3F',
+          lighter: '#28705C',
+          dark: '#0B2D25',
         },
         gold: {
-          DEFAULT: '#C9A84C',
-          light: '#E8C96A',
-          dark: '#A8852E',
+          DEFAULT: '#C6A45B',
+          light: '#D8BC7A',
+          dark: '#A9823E',
         },
         dark: {
-          DEFAULT: '#0A0A0A',
-          100: '#111111',
-          200: '#1A1A1A',
-          300: '#222222',
-          400: '#2A2A2A',
+          DEFAULT: '#263B34',
+          100: '#17352C',
+          200: '#1D4035',
+          300: '#244A3D',
+          400: '#315347',
         },
         surface: {
-          DEFAULT: '#F8F8F6',
-          dark: '#EFEEEA',
+          DEFAULT: '#F4F1EA',
+          dark: '#EEEAE1',
         },
       },
       fontFamily: {
-        arabic: ['Tajawal', 'sans-serif'],
-        english: ['Outfit', 'sans-serif'],
+        arabic: ['Alexandria', 'Tajawal', 'sans-serif'],
+        english: ['Inter', 'Outfit', 'sans-serif'],
         display: ['Cormorant Garamond', 'serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-gradient': 'linear-gradient(135deg, #0D2818 0%, #1B4332 50%, #0A0A0A 100%)',
-        'gold-gradient': 'linear-gradient(135deg, #C9A84C 0%, #E8C96A 50%, #A8852E 100%)',
+        'hero-gradient': 'linear-gradient(135deg, #0B2D25 0%, #103C32 58%, #263B34 100%)',
+        'gold-gradient': 'linear-gradient(135deg, #A9823E 0%, #C6A45B 50%, #D8BC7A 100%)',
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out',
@@ -86,8 +86,8 @@ export default {
       boxShadow: {
         'luxury': '0 20px 60px rgba(0,0,0,0.15)',
         'luxury-dark': '0 20px 60px rgba(0,0,0,0.5)',
-        'gold': '0 4px 20px rgba(201, 168, 76, 0.4)',
-        'green': '0 4px 20px rgba(27, 67, 50, 0.4)',
+        'gold': '0 4px 20px rgba(198, 164, 91, 0.28)',
+        'green': '0 4px 20px rgba(16, 60, 50, 0.18)',
       },
       screens: {
         'xs': '375px',

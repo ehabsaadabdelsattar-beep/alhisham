@@ -1,0 +1,100 @@
+/* AL HISHAM DEVELOPMENTS — Luxury Emerald Design Tokens
+   Central source of truth for brand colors, surfaces, typography and layout.
+   Keep component styles semantic; avoid hard-coded brand colors in new UI.
+*/
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --brand-emerald: #103C32;
+  --brand-forest: #263B34;
+  --brand-gold: #C6A45B;
+  --brand-gold-hover: #B58F45;
+  --brand-ivory: #F4F1EA;
+  --brand-beige: #D8D2C6;
+
+  /* Semantic surfaces */
+  --color-bg: #F4F1EA;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #EEEAE1;
+  --color-surface-inverse: #103C32;
+  --color-text: #24352E;
+  --color-text-muted: #777D76;
+  --color-text-inverse: #FFFFFF;
+  --color-border: #D8D2C6;
+  --color-border-strong: #BDB5A7;
+  --color-primary: var(--brand-emerald);
+  --color-primary-hover: #174B3F;
+  --color-accent: var(--brand-gold);
+  --color-focus: #C6A45B;
+
+  /* Feedback */
+  --color-success: #287A55;
+  --color-warning: #A87522;
+  --color-danger: #B54747;
+  --color-info: #426F8A;
+
+  /* Typography */
+  --font-arabic: 'Alexandria', 'Tajawal', sans-serif;
+  --font-english: 'Inter', 'Outfit', sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-hero: clamp(2.5rem, 5vw, 4rem);
+
+  /* Layout */
+  --container-max: 82rem;
+  --header-height: 5rem;
+  --section-space-y: clamp(4rem, 8vw, 7rem);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Shape and elevation */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 9999px;
+  --shadow-sm: 0 1px 3px rgba(16, 60, 50, 0.06);
+  --shadow-card: 0 8px 28px rgba(16, 60, 50, 0.08);
+  --shadow-elevated: 0 18px 48px rgba(16, 60, 50, 0.12);
+
+  /* Motion */
+  --motion-fast: 160ms ease;
+  --motion-standard: 240ms ease;
+  --motion-emphasis: 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Dark mode preserves the Emerald identity while changing semantic surfaces. */
+.dark {
+  color-scheme: dark;
+  --color-bg: #10251F;
+  --color-surface: #17352C;
+  --color-surface-muted: #1D4035;
+  --color-surface-inverse: #F4F1EA;
+  --color-text: #F4F1EA;
+  --color-text-muted: #B8C3BC;
+  --color-text-inverse: #17352C;
+  --color-border: #315347;
+  --color-border-strong: #49695C;
+  --color-primary: #174B3F;
+  --color-primary-hover: #205B4C;
+  --color-accent: #D2B36F;
+  --color-focus: #D2B36F;
+}

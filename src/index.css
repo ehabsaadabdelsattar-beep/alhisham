@@ -1,3 +1,5 @@
+@import './styles/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,14 +15,15 @@
 }
 
 :root {
-  --primary: #0A0A0A;
-  --primary-light: #1A1A1A;
-  --gold: #C9A050;
-  --gold-light: #DFBA68;
-  --gold-dark: #A47E33;
-  --dark: #0A0A0A;
-  --surface: #F8F8F6;
-  --surface-dark: #121212;
+  /* Backward-compatible aliases for existing components */
+  --primary: var(--brand-emerald);
+  --primary-light: #174B3F;
+  --gold: var(--brand-gold);
+  --gold-light: #D8BC7A;
+  --gold-dark: #A9823E;
+  --dark: var(--brand-forest);
+  --surface: var(--color-bg);
+  --surface-dark: #10251F;
 }
 
 html {
@@ -29,25 +32,25 @@ html {
 }
 
 body {
-  font-family: 'Tajawal', 'Outfit', sans-serif;
-  background-color: var(--surface);
-  color: var(--dark);
+  font-family: var(--font-arabic);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   overflow-x: hidden;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .dark body {
-  background-color: #0A0A0A;
-  color: #F8F8F6;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 /* RTL / LTR Typography */
 [dir="ltr"] {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-english);
 }
 
 [dir="rtl"] {
-  font-family: 'Tajawal', sans-serif;
+  font-family: var(--font-arabic);
 }
 
 /* ============================================================
@@ -58,14 +61,14 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: var(--brand-forest);
 }
 ::-webkit-scrollbar-thumb {
-  background: #C9A050;
+  background: var(--brand-gold);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #DFBA68;
+  background: #D8BC7A;
 }
 
 /* ============================================================
@@ -204,8 +207,8 @@ body {
 .swiper-button-next,
 .swiper-button-prev {
   color: #C9A050 !important;
-  background: rgba(10, 10, 10, 0.85);
-  border: 1px solid rgba(201, 160, 80, 0.3);
+  background: rgba(16, 60, 50, 0.92);
+  border: 1px solid rgba(198, 164, 91, 0.35);
   width: 48px !important;
   height: 48px !important;
   border-radius: 0;
@@ -221,8 +224,8 @@ body {
    ============================================================ */
 
 .dark .card-luxury {
-  background: #121212;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: #17352C;
+  border: 1px solid rgba(244,241,234,0.1);
 }
 
 /* ============================================================
@@ -230,6 +233,6 @@ body {
    ============================================================ */
 
 ::selection {
-  background: rgba(201, 160, 80, 0.25);
-  color: #C9A050;
+  background: rgba(198, 164, 91, 0.25);
+  color: #103C32;
 }

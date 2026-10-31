@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { SITE_URL, SITE_NAME, SITE_NAME_AR, DEFAULT_LOGO } from '../../lib/schema';
+import { SITE_URL, SITE_NAME, SITE_NAME_AR } from '../../lib/schema';
 import { useSettings } from '../../context/SettingsContext';
 
 interface SEOProps {

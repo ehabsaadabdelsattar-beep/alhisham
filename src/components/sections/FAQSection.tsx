@@ -31,34 +31,39 @@ export default function FAQSection() {
             </a>
           </div>
 
-          {/* Right: Accordion */}
-          <div className="space-y-2">
-            {faqs.map((faq: any, i: number) => (
-              <div key={i} className="faq-item border border-gray-100 dark:border-dark-300">
-                <button
-                  className="w-full flex items-center justify-between px-6 py-5 text-start rtl:text-end hover:bg-surface dark:hover:bg-dark-200 transition-colors"
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                >
-                  <span className={`font-semibold text-sm md:text-base transition-colors ${openIndex === i ? 'text-primary dark:text-gold' : 'text-dark dark:text-white'}`}>
-                    {faq.q}
-                  </span>
-                  <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center border transition-all duration-300 ${
-                    openIndex === i
-                      ? 'bg-primary border-primary text-white rotate-45'
-                      : 'border-gray-200 dark:border-dark-300 text-gray-400 hover:border-primary hover:text-primary'
-                  }`}>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                </button>
-                <div className={`overflow-hidden transition-all duration-400 ${openIndex === i ? 'max-h-96' : 'max-h-0'}`}>
-                  <p className="px-6 pb-5 text-gray-500 dark:text-gray-400 text-sm leading-relaxed border-t border-gray-50 dark:border-dark-300 pt-4">
-                    {faq.a}
-                  </p>
-                </div>
-              </div>
-            ))}
+          {/* Right: One Green Way Architectural Accordion */}
+          <div className="accordion-css">
+            <ul className="accordion-css__list">
+              {faqs.map((faq: any, i: number) => {
+                const isOpen = openIndex === i;
+                return (
+                  <li key={i} className="accordion-css__item">
+                    <div
+                      className="accordion-css__item-top"
+                      onClick={() => setOpenIndex(isOpen ? null : i)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <h3 className={`accordion-css__item-h3 ${isOpen ? '!text-gold' : ''}`}>
+                        {faq.q}
+                      </h3>
+                      <div className={`accordion-css__item-icon ${isOpen ? 'is-active' : ''}`}>
+                        <svg className="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className={`accordion-css__item-bottom ${isOpen ? 'is-open' : ''}`}>
+                      <div className="accordion-css__item-bottom-wrap">
+                        <div className="accordion-css__item-bottom-content">
+                          {faq.a}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
       </div>

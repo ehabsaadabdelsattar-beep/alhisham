@@ -5,7 +5,7 @@ import { projectsService } from '../../services/projects';
 import type { Project } from '../../services/projects';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiSave, FiArrowRight, FiUpload, FiTrash2, FiEye, FiEyeOff,
+  FiSave, FiArrowRight, FiUpload, FiTrash2, FiEye,
   FiStar, FiAlertCircle, FiCheckCircle
 } from 'react-icons/fi';
 
@@ -36,10 +36,6 @@ export default function AdminProjectForm() {
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'details' | 'media' | 'investor' | 'seo'>('basic');
 
-  useEffect(() => {
-    if (id) fetchProject();
-  }, [id]);
-
   const fetchProject = async () => {
     try {
       const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
@@ -51,6 +47,10 @@ export default function AdminProjectForm() {
       setInitialLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) void fetchProject();
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;

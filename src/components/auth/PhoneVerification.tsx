@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../context/AuthContext';
 
 interface PhoneVerificationProps {
   phone: string;
@@ -15,27 +14,14 @@ export default function PhoneVerification({ phone, onVerified, onClose }: PhoneV
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timer, setTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
   const [smsSent, setSmsSent] = useState(false);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
-  useEffect(() => {
-    sendOtp();
-  }, []);
+  const canResend = timer === 0;
 
-  useEffect(() => {
-    if (timer > 0 && smsSent) {
-      const interval = setInterval(() => setTimer(t => t - 1), 1000);
-      return () => clearInterval(interval);
-    } else if (timer === 0) {
-      setCanResend(true);
-    }
-  }, [timer, smsSent]);
-
-  const sendOtp = async () => {
+  const sendOtp = useCallback(async () => {
     setSending(true);
     setError(null);
-    setCanResend(false);
     setTimer(60);
 
     try {
@@ -52,12 +38,24 @@ export default function PhoneVerification({ phone, onVerified, onClose }: PhoneV
       }
 
       setSmsSent(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send OTP verification code. Please check your phone number.');
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to send OTP verification code. Please check your phone number.';
+      setError(errorMsg);
     } finally {
       setSending(false);
     }
-  };
+  }, [phone]);
+
+  useEffect(() => {
+    void sendOtp();
+  }, [sendOtp]);
+
+  useEffect(() => {
+    if (timer > 0 && smsSent) {
+      const interval = setInterval(() => setTimer(t => t - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer, smsSent]);
 
   const handleInput = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -112,8 +110,9 @@ export default function PhoneVerification({ phone, onVerified, onClose }: PhoneV
       }
 
       onVerified();
-    } catch (err: any) {
-      setError(err.message || 'Failed to verify code.');
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to verify code.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

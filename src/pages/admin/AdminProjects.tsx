@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiEye, FiEyeOff, FiExternalLink, FiRefreshCw } from 'react-icons/fi';
 import { projectsService } from '../../services/projects';
 import { supabase } from '../../lib/supabase';
@@ -29,7 +29,6 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function AdminProjects() {
-  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,10 +37,6 @@ export default function AdminProjects() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
 
   const fetchProjects = async () => {
     try {
@@ -54,6 +49,10 @@ export default function AdminProjects() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    void fetchProjects();
+  }, []);
 
   const handleDelete = async (id: string, name: string) => {
     if (!window.confirm(`هل أنت متأكد من حذف "${name}"؟\nلا يمكن التراجع عن هذا الإجراء.`)) return;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLang } from '../context/LanguageContext';
 
@@ -64,7 +64,7 @@ export default function AIChat() {
     ? ['عرض المشاريع', 'طلب استشارة', 'الأسعار والعروض', 'تواصل مع الفريق']
     : ['View Projects', 'Request Consultation', 'Prices & Offers', 'Contact Team'];
 
-  const sendMessage = (text: string) => {
+  const sendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
     const userMsg: Message = { id: Date.now(), text, sender: 'user', timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
@@ -76,7 +76,7 @@ export default function AIChat() {
       setMessages(prev => [...prev, botMsg]);
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }, 800);
-  };
+  }, [lang]);
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString(lang === 'ar' ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' });

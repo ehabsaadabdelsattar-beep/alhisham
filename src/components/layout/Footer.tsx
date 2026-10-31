@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import BrandLogo from '../ui/BrandLogo';
 
 const WHATSAPP = '201103657888';
 
@@ -57,19 +58,18 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-dark-100 dark:bg-dark text-white">
-      {/* Top Wave */}
-      <div className="h-1 bg-gradient-to-r from-primary via-gold to-primary" />
-
+    <footer className="bg-forest-dark text-ivory border-t border-white/10">
       {/* Main Footer */}
       <div className="container-custom py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-1">
-            <img src="/logo.png" alt="AL HISHAM DEVELOPMENT" className="h-32 lg:h-40 mb-6 brightness-0 invert w-auto object-contain" />
-            <p className="text-gray-400 text-sm leading-relaxed mb-6">
+            <BrandLogo theme="white" size="lg" className="mb-6" />
+            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-6 font-light font-sans">
               {t('footer.description')}
             </p>
+
+
             {/* Social Links */}
             <div className="flex items-center gap-3">
               {socialLinks.map((s) => (
@@ -79,7 +79,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.name}
-                  className="w-9 h-9 flex items-center justify-center border border-white/10 hover:border-gold hover:text-gold hover:bg-gold/10 text-gray-400 transition-all duration-200 rounded-sm"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/15 hover:border-gold hover:text-gold hover:bg-gold/10 text-gray-300 transition-all duration-300"
                 >
                   {s.icon}
                 </a>
@@ -89,16 +89,16 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-6 flex items-center gap-2">
+            <h4 className="text-white font-semibold mb-6 flex items-center gap-2 font-sans">
               <span className="w-6 h-0.5 bg-gold" />
               {t('footer.quick_links')}
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-3 font-sans">
               {quickLinks.map((l) => (
                 <li key={l.path}>
                   <Link
                     to={l.path}
-                    className="text-gray-400 hover:text-gold text-sm transition-colors duration-200 flex items-center gap-2 group"
+                    className="text-gray-300 hover:text-gold text-xs sm:text-sm transition-colors duration-200 flex items-center gap-2 group"
                   >
                     <span className="w-0 group-hover:w-3 h-0.5 bg-gold transition-all duration-200 inline-block" />
                     {l.label}
@@ -110,16 +110,16 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white font-semibold mb-6 flex items-center gap-2">
+            <h4 className="text-white font-semibold mb-6 flex items-center gap-2 font-sans">
               <span className="w-6 h-0.5 bg-gold" />
               {t('footer.services')}
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-3 font-sans">
               {services.map((s, i) => (
                 <li key={i}>
                   <Link
                     to="/#services"
-                    className="text-gray-400 hover:text-gold text-sm transition-colors duration-200 flex items-center gap-2 group"
+                    className="text-gray-300 hover:text-gold text-xs sm:text-sm transition-colors duration-200 flex items-center gap-2 group"
                   >
                     <span className="w-0 group-hover:w-3 h-0.5 bg-gold transition-all duration-200 inline-block" />
                     {s}
@@ -131,34 +131,34 @@ export default function Footer() {
 
           {/* Contact & Newsletter */}
           <div>
-            <h4 className="text-white font-semibold mb-6 flex items-center gap-2">
+            <h4 className="text-white font-semibold mb-6 flex items-center gap-2 font-sans">
               <span className="w-6 h-0.5 bg-gold" />
               {t('footer.newsletter')}
             </h4>
-            <p className="text-gray-400 text-sm mb-4">
-              اشترك في نشرتنا الإخبارية لمتابعة أحدث مشاريعنا وفرص الاستثمار.
+            <p className="text-gray-300 text-xs sm:text-sm mb-4 leading-relaxed font-sans">
+              اشترك في نشرتنا الإخبارية الخاصة لمتابعة أحدث المشاريع وفرص الاستثمار الحصرية.
             </p>
             <form className="flex gap-2 mb-8" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 placeholder={t('footer.newsletter_placeholder')}
-                className="flex-1 px-4 py-2.5 bg-dark-300 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gold transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-forest border border-white/15 text-white placeholder-gray-400 text-xs focus:outline-none focus:border-gold transition-colors font-sans"
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 bg-gold text-dark text-sm font-semibold hover:bg-gold-light transition-colors"
+                className="btn-emerald !py-2.5 !px-5 !rounded-xl !text-xs"
               >
                 {t('footer.subscribe')}
               </button>
             </form>
 
             {/* Contact Info */}
-            <div className="space-y-3 text-sm text-gray-400">
+            <div className="space-y-3 text-xs sm:text-sm text-gray-300 font-sans">
               <div className="flex items-center gap-3">
                 <svg className="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <a href={`https://wa.me/${WHATSAPP}`} className="hover:text-gold transition-colors">
+                <a href={`https://wa.me/${WHATSAPP}`} className="hover:text-gold transition-colors font-english">
                   +20 110 365 7888
                 </a>
               </div>
@@ -166,7 +166,7 @@ export default function Footer() {
                 <svg className="w-4 h-4 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:hisham841978@gmail.com" className="hover:text-gold transition-colors">
+                <a href="mailto:hisham841978@gmail.com" className="hover:text-gold transition-colors font-english">
                   hisham841978@gmail.com
                 </a>
               </div>
@@ -176,10 +176,10 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/5">
-        <div className="container-custom py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <div className="border-t border-white/5 bg-forest-dark/80">
+        <div className="container-custom py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400 font-sans">
           <p>
-            © {year} AL HISHAM DEVELOPMENT. {t('footer.rights')}.
+            © <span copyright-year="">{year}</span> AL HISHAM DEVELOPMENTS. {t('footer.rights')}.
           </p>
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="hover:text-gold transition-colors">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -7,9 +7,8 @@ import type { Transaction } from '../../services/finance';
 import { projectsService } from '../../services/projects';
 import type { Project } from '../../services/projects';
 import {
-  FiDollarSign, FiFilter, FiDownload, FiPlus, FiSearch,
-  FiEdit3, FiCheckCircle, FiXCircle, FiClock, FiRefreshCw,
-  FiX
+  FiDollarSign, FiDownload, FiPlus, FiSearch,
+  FiEdit3, FiXCircle, FiX
 } from 'react-icons/fi';
 
 const STATUS_COLORS: Record<string, string> = {

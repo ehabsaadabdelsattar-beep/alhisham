@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useTranslation } from 'react-i18next';
 import { useLang } from '../context/LanguageContext';
 import { blogPosts } from '../data';
 

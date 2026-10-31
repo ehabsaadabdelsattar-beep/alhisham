@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getRoleLabel } from '../../lib/permissions';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '../../components/ui/SEO';
+import BrandLogo from '../../components/ui/BrandLogo';
 import {
   FiHome, FiBox, FiFileText, FiImage, FiUsers,
   FiInbox, FiSettings, FiLogOut, FiActivity,
@@ -41,6 +42,97 @@ function getInitials(name: string | null): string {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
 }
 
+interface SidebarContentProps {
+  profile: { avatar_url?: string | null; full_name?: string | null; email?: string | null; role?: string } | null;
+  navItems: NavItem[];
+  isActive: (path: string, exact?: boolean) => boolean;
+  onClose: () => void;
+  onLogout: () => void;
+}
+
+function SidebarContent({ profile, navItems, isActive, onClose, onLogout }: SidebarContentProps) {
+  return (
+    <div className="flex flex-col h-full bg-emerald-dark text-ivory">
+      {/* Brand Header */}
+      <div className="flex items-center justify-between h-20 px-5 border-b border-white/10 flex-shrink-0">
+        <Link to="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
+          <BrandLogo theme="white" size="sm" />
+        </Link>
+        <button
+          onClick={onClose}
+          className="lg:hidden w-8 h-8 flex items-center justify-center rounded-xl text-gray-300 hover:text-white hover:bg-white/10"
+        >
+          <FiX className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* User Profile Card */}
+      <div className="px-5 py-5 border-b border-white/10 bg-forest/40">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/90 to-yellow-600 flex items-center justify-center text-forest font-bold text-sm flex-shrink-0 shadow-md">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt={profile.full_name || ''} className="w-full h-full rounded-xl object-cover" />
+            ) : (
+              getInitials(profile?.full_name || null)
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white truncate font-sans">{profile?.full_name || 'Admin User'}</p>
+            <p className="text-xs text-textSecondary dark:text-gray-400 truncate font-sans">{profile?.email}</p>
+          </div>
+        </div>
+        <span className="mt-2.5 inline-block px-2.5 py-0.5 rounded-lg text-[11px] bg-emerald/60 text-gold border border-gold/30 font-semibold font-sans">
+          {getRoleLabel(profile?.role || '', 'ar')}
+        </span>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="flex-1 overflow-y-auto px-3.5 py-4 space-y-1">
+        {navItems.map(item => {
+          const active = isActive(item.path, item.exact);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={onClose}
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-sans transition-all ${
+                active
+                  ? 'bg-emerald text-white border border-gold/40 shadow-sm font-semibold'
+                  : 'text-ivory/75 hover:text-white hover:bg-emerald/30'
+              }`}
+            >
+              <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-gold' : 'text-ivory/60'}`} />
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Footer Controls */}
+      <div className="px-3.5 py-4 border-t border-white/10 space-y-1.5 flex-shrink-0 bg-forest-dark/40">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-ivory/75 hover:text-white hover:bg-white/5 transition-all font-sans"
+        >
+          <FiGlobe className="w-4 h-4 text-gold flex-shrink-0" />
+          <span>عرض الموقع</span>
+          <FiExternalLink className="w-3.5 h-3.5 mr-auto opacity-50" />
+        </a>
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-all font-sans"
+        >
+          <FiLogOut className="w-4 h-4 flex-shrink-0" />
+          <span>تسجيل الخروج</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminLayout() {
   const { signOut, profile, hasPermission } = useAuth();
   const navigate = useNavigate();
@@ -59,99 +151,22 @@ export default function AdminLayout() {
     if (profile?.role === 'admin') return true;
     if (item.adminOnly) return false;
     if (item.permission) return hasPermission(item.permission);
-    // Legacy editor: show core items without explicit permission match
     if (profile?.role === 'editor') {
       return ['/admin', '/admin/projects', '/admin/articles', '/admin/media', '/admin/requests', '/admin/crm'].includes(item.path);
     }
     return false;
   });
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between h-16 px-5 border-b border-gray-800/50 flex-shrink-0">
-        <Link to="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group">
-          <img src="/logo.png" alt="AL HISHAM" className="h-8 w-auto object-contain brightness-0 invert" />
-        </Link>
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="lg:hidden w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-white"
-        >
-          <FiX className="w-4 h-4" />
-        </button>
-      </div>
-
-      <div className="px-4 py-4 border-b border-gray-800/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/80 to-yellow-600 flex items-center justify-center text-dark font-bold text-sm flex-shrink-0">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name || ''} className="w-full h-full rounded-full object-cover" />
-            ) : (
-              getInitials(profile?.full_name || null)
-            )}
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{profile?.full_name || 'Admin User'}</p>
-            <p className="text-xs text-gray-400 truncate">{profile?.email}</p>
-          </div>
-        </div>
-        <span className="mt-2 inline-block px-2 py-0.5 rounded-full text-xs bg-gold/20 text-gold border border-gold/30">
-          {getRoleLabel(profile?.role || '', 'ar')}
-        </span>
-      </div>
-
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        {navItems.map(item => {
-          const active = isActive(item.path, item.exact);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                active
-                  ? 'bg-gold/15 text-gold border border-gold/20 font-medium'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-gold' : ''}`} />
-              {item.name}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="px-3 py-4 border-t border-gray-800/50 space-y-1 flex-shrink-0">
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all"
-        >
-          <FiGlobe className="w-4 h-4 flex-shrink-0" />
-          عرض الموقع
-          <FiExternalLink className="w-3 h-3 mr-auto opacity-50" />
-        </a>
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
-        >
-          <FiLogOut className="w-4 h-4 flex-shrink-0" />
-          تسجيل الخروج
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <>
       <SEO
         title="لوحة التحكم"
-        description="Admin Dashboard - AL HISHAM DEVELOPMENT"
+        description="Admin Dashboard - AL HISHAM DEVELOPMENTS"
         noindex
       />
 
-      <div className="flex h-screen bg-gray-50 dark:bg-[#111] overflow-hidden" dir="rtl">
+      <div className="flex h-screen bg-ivory dark:bg-forest-dark overflow-hidden font-sans" dir="rtl">
+        {/* Mobile Backdrop */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
@@ -164,10 +179,18 @@ export default function AdminLayout() {
           )}
         </AnimatePresence>
 
-        <aside className="hidden lg:flex w-60 bg-[#0f0f0f] border-l border-gray-800/50 flex-col flex-shrink-0">
-          <SidebarContent />
+        {/* Desktop Sidebar (Deep Emerald) */}
+        <aside className="hidden lg:flex w-64 bg-emerald-dark border-l border-white/10 flex-col flex-shrink-0 shadow-xl">
+          <SidebarContent
+            profile={profile}
+            navItems={navItems}
+            isActive={isActive}
+            onClose={() => setSidebarOpen(false)}
+            onLogout={handleLogout}
+          />
         </aside>
 
+        {/* Mobile Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.aside
@@ -175,23 +198,31 @@ export default function AdminLayout() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.25 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-64 bg-[#0f0f0f] border-l border-gray-800/50 flex flex-col lg:hidden"
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-emerald-dark border-l border-white/10 flex flex-col lg:hidden shadow-2xl"
             >
-              <SidebarContent />
+              <SidebarContent
+                profile={profile}
+                navItems={navItems}
+                isActive={isActive}
+                onClose={() => setSidebarOpen(false)}
+                onLogout={handleLogout}
+              />
             </motion.aside>
           )}
         </AnimatePresence>
 
+        {/* Workspace: Top Header & Main Content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <header className="h-16 bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
+          <header className="h-16 bg-white dark:bg-forest border-b border-beige/60 dark:border-white/10 flex items-center justify-between px-4 sm:px-6 flex-shrink-0 shadow-xs">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-300 text-gray-600 dark:text-gray-400"
+                className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-beige/30 dark:bg-forest-dark text-forest dark:text-ivory"
+                aria-label="Open sidebar"
               >
                 <FiMenu className="w-5 h-5" />
               </button>
-              <div className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
+              <div className="text-sm font-semibold text-forest dark:text-ivory hidden sm:block">
                 {navItems.find(n => isActive(n.path, n.exact))?.name || 'لوحة التحكم'}
               </div>
             </div>
@@ -201,15 +232,15 @@ export default function AdminLayout() {
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-dark-300 text-gray-600 dark:text-gray-400 hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-ivory dark:bg-forest-dark text-forest dark:text-ivory hover:bg-beige/50 border border-beige/60 dark:border-white/10 transition-colors"
               >
-                <FiGlobe className="w-3.5 h-3.5" />
+                <FiGlobe className="w-3.5 h-3.5 text-gold" />
                 <span className="hidden sm:inline">عرض الموقع</span>
-                <FiExternalLink className="w-3 h-3" />
+                <FiExternalLink className="w-3 h-3 opacity-60" />
               </a>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-900/30 transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-900/30 transition-colors"
               >
                 <FiLogOut className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">خروج</span>
@@ -217,7 +248,8 @@ export default function AdminLayout() {
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          {/* Main Content Workspace (Warm Ivory `#F4F1EA`) */}
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-ivory dark:bg-forest-dark">
             <Outlet />
           </main>
         </div>

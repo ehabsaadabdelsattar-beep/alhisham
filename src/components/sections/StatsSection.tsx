@@ -1,68 +1,119 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, useInView } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-interface CounterProps {
+gsap.registerPlugin(ScrollTrigger);
+
+interface StatConfig {
   end: number;
-  suffix?: string;
   prefix?: string;
-  duration?: number;
-}
-
-function useCountUp(end: number, duration = 2000, shouldStart: boolean) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!shouldStart) return;
-    let startTime: number | null = null;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * end));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [end, duration, shouldStart]);
-  return count;
-}
-
-function StatItem({ end, suffix = '', prefix = '', label, duration = 2000, shouldStart, index }: CounterProps & { label: string; shouldStart: boolean; index: number }) {
-  const count = useCountUp(end, duration, shouldStart);
-  return (
-    <motion.div
-      className="flex flex-col items-center justify-center p-6 sm:p-8 relative group"
-      initial={{ opacity: 0, y: 20 }}
-      animate={shouldStart ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-    >
-      <div dir="ltr" className="flex items-baseline justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-white font-english tabular-nums tracking-tight mb-2 whitespace-nowrap">
-        {prefix && <span className="text-gradient-gold mr-1">{prefix}</span>}
-        <span className="text-gradient-gold">{count.toLocaleString()}</span>
-        {suffix && <span className="text-lg sm:text-xl md:text-2xl text-white ml-2 font-arabic">{suffix}</span>}
-      </div>
-      <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-medium text-center mt-2">{label}</p>
-    </motion.div>
-  );
+  suffix?: string;
+  label: string;
 }
 
 export default function StatsSection() {
   const { t } = useTranslation();
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const sectionRef = useRef<HTMLElement>(null);
+  const itemsRef = useRef<HTMLDivElement[]>([]);
+  const numbersRef = useRef<HTMLSpanElement[]>([]);
 
-  const stats = [
+  const stats: StatConfig[] = [
     { end: 15, prefix: '+', label: t('stats.years') },
     { end: 87, prefix: '+', label: t('stats.projects') },
     { end: 1240, prefix: '+', label: t('stats.clients') },
     { end: 850000, prefix: '+', suffix: 'م²', label: t('stats.sqm') },
   ];
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      // 1. Staggered card entrance with ScrollTrigger
+      gsap.fromTo(
+        itemsRef.current,
+        { opacity: 0, y: 35 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 85%',
+            once: true,
+          },
+        }
+      );
+
+      // 2. Smooth GSAP counter for each statistic
+      stats.forEach((stat, idx) => {
+        const numEl = numbersRef.current[idx];
+        if (!numEl) return;
+
+        const counterObj = { value: 0 };
+
+        gsap.to(counterObj, {
+          value: stat.end,
+          duration: 2.2 + idx * 0.2,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 85%',
+            once: true,
+          },
+          onUpdate: () => {
+            numEl.textContent = Math.floor(counterObj.value).toLocaleString();
+          },
+        });
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, [t]);
+
   return (
-    <section ref={ref} className="bg-black py-12 border-y border-gold/20 relative z-20 overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="bg-ivory dark:bg-forest py-8 sm:py-12 border-b border-beige/70 dark:border-white/10 relative z-20 overflow-hidden"
+    >
       <div className="container-custom">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x lg:divide-x-reverse divide-white/10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse divide-beige/80 dark:divide-white/10">
           {stats.map((stat, i) => (
-            <StatItem key={i} {...stat} shouldStart={isInView} duration={1800 + i * 200} index={i} />
+            <div
+              key={i}
+              ref={(el) => {
+                if (el) itemsRef.current[i] = el;
+              }}
+              className="flex flex-col items-center justify-center p-6 sm:p-8 relative group cursor-default"
+            >
+              <div
+                dir="ltr"
+                className="flex items-baseline justify-center text-3xl sm:text-4xl md:text-5xl font-bold text-emerald dark:text-ivory font-english tabular-nums tracking-tight mb-1 whitespace-nowrap"
+              >
+                {stat.prefix && <span className="text-gold mr-1.5 font-normal">{stat.prefix}</span>}
+                <span
+                  ref={(el) => {
+                    if (el) numbersRef.current[i] = el;
+                  }}
+                  className="font-sans"
+                >
+                  0
+                </span>
+                {stat.suffix && (
+                  <span className="text-lg sm:text-xl md:text-2xl text-textSecondary dark:text-beige ml-2 font-arabic">
+                    {stat.suffix}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs uppercase tracking-[0.2em] text-textSecondary dark:text-gray-400 font-medium text-center mt-2 font-sans">
+                {stat.label}
+              </p>
+              {/* Subtle indicator dot with GSAP hover feel */}
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/50 mt-3 opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-300" />
+            </div>
           ))}
         </div>
       </div>

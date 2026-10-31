@@ -51,7 +51,10 @@ export default function AdminUsers() {
   const canEdit = hasPermission('users.edit') || me?.role === 'admin';
   const canManagePerms = hasPermission('users.manage_permissions') || me?.role === 'admin';
 
-  useEffect(() => { fetchUsers(); }, []);
+  const showToast = (type: 'success' | 'error', text: string) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const fetchUsers = async () => {
     try {
@@ -62,17 +65,17 @@ export default function AdminUsers() {
         .order('created_at', { ascending: false });
       if (error) throw error;
       setUsers(data as UserProfile[]);
-    } catch (err: any) {
-      showToast('error', 'فشل تحميل قائمة المستخدمين: ' + (err.message || 'خطأ غير معروف'));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'خطأ غير معروف';
+      showToast('error', 'فشل تحميل قائمة المستخدمين: ' + msg);
     } finally {
       setLoading(false);
     }
   };
 
-  const showToast = (type: 'success' | 'error', text: string) => {
-    setToast({ type, text });
-    setTimeout(() => setToast(null), 4000);
-  };
+  useEffect(() => {
+    void fetchUsers();
+  }, []);
 
   const handleRoleChange = async (userId: string, newRole: AppRole, userName: string) => {
     if (!canChangeRole) {

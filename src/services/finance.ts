@@ -64,7 +64,7 @@ export const financeService = {
     project_id?: string;
     search?: string;
   }) {
-    const { page = 1, limit = 50, status, type, project_id, search } = options || {};
+    const { page = 1, limit = 50, status, type, project_id } = options || {};
     let query = supabase
       .from('transactions')
       .select(`

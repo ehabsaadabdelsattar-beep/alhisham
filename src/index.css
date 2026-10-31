@@ -1,9 +1,61 @@
+/* ============================================================
+   ONE GREEN WAY FONTS (NOCTIS & HAFFER)
+   ============================================================ */
+@font-face {
+  font-family: 'Noctis';
+  src: url("https://cdn.prod.website-files.com/67b35e13f579f0350b506902/67bcb6eb1d4ab50b9023d5d0_Noctis-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noctis';
+  src: url("https://cdn.prod.website-files.com/67b35e13f579f0350b506902/67bcb6ea712d18803602e955_Noctis-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noctis';
+  src: url("https://cdn.prod.website-files.com/67b35e13f579f0350b506902/67bdacdf5fb6682c2647a525_Noctis-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noctis';
+  src: url("https://cdn.prod.website-files.com/67b35e13f579f0350b506902/67bdacdf7eb8c8fd135f875d_Noctis-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Haffer';
+  src: url("https://cdn.prod.website-files.com/67b35e13f579f0350b506902/67bcb720850c7f501e80a3b4_Haffer-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Haffer';
+  src: url("https://cdn.prod.website-files.com/67b35e13f579f0350b506902/67bcb720850c7f501e80a3cc_Haffer-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================
-   GLOBAL BASE STYLES - AL HISHAM DEVELOPMENT (LUXURY REAL ESTATE)
+   GLOBAL BASE STYLES - AL HISHAM DEVELOPMENTS
+   LUXURY EMERALD IDENTITY & EDITORIAL ARCHITECTURE
    ============================================================ */
 
 * {
@@ -13,14 +65,43 @@
 }
 
 :root {
-  --primary: #0A0A0A;
-  --primary-light: #1A1A1A;
-  --gold: #C9A050;
-  --gold-light: #DFBA68;
-  --gold-dark: #A47E33;
-  --dark: #0A0A0A;
-  --surface: #F8F8F6;
-  --surface-dark: #121212;
+  /* Al Hisham Primary Identity */
+  --primary: #103C32;        /* Primary Emerald */
+  --forest: #263B34;         /* Deep Forest Green */
+  --gold: #C6A45B;           /* Champagne Gold */
+  --gold-light: #D8BC79;
+  --gold-dark: #A8863D;
+  --ivory: #F4F1EA;          /* Warm Ivory */
+  --white: #FFFFFF;          /* Pure White */
+  --text-primary: #24352E;   /* Primary Text */
+  --text-secondary: #777D76; /* Secondary Text */
+  --beige: #D8D2C6;          /* Soft Beige */
+  --surface: #F4F1EA;
+  --surface-card: #FFFFFF;
+  --surface-dark: #263B34;
+
+  /* One Green Way Token Mappings (Emerald & Gold Preservation) */
+  --_colors---colors--sun-yellow: #C6A45B;
+  --_colors---colors--neutral-yellow: #F4F1EA;
+  --_colors---colors--off-white: #FAF8F4;
+  --_colors---colors--black: #103C32;
+  --_colors---colors--pure-black: #0C2C24;
+  --_colors---colors--green: #103C32;
+  --_colors---colors--neutral-green: #263B34;
+  --_colors---colors--brown: #777D76;
+  --_colors---colors--white: #FFFFFF;
+  --_colors---colors--white-10: rgba(255, 255, 255, 0.1);
+  --_colors---colors--white-20: rgba(255, 255, 255, 0.2);
+  --_colors---colors--white-40: rgba(255, 255, 255, 0.4);
+  --_colors---colors--black-10: rgba(16, 60, 50, 0.1);
+  --_colors---colors--black-20: rgba(16, 60, 50, 0.2);
+  --_colors---colors--black-40: rgba(16, 60, 50, 0.4);
+  --_colors---colors--black-50: rgba(16, 60, 50, 0.5);
+  --_colors---colors--transparent: transparent;
+  --_grid-padding-global---padding-global--size: 2rem;
+  --_grid-padding-global---grid--grid-gap: 2rem;
+  --font--primary-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+  --font--secondary-family: 'Cormorant Garamond', Georgia, serif;
 }
 
 html {
@@ -29,91 +110,126 @@ html {
 }
 
 body {
-  font-family: 'Tajawal', 'Outfit', sans-serif;
-  background-color: var(--surface);
-  color: var(--dark);
+  font-family: 'IBM Plex Sans Arabic', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--ivory);
+  color: var(--text-primary);
   overflow-x: hidden;
   transition: background-color 0.4s ease, color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .dark body {
-  background-color: #0A0A0A;
-  color: #F8F8F6;
+  background-color: #0C2C24;
+  color: #F4F1EA;
 }
 
-/* RTL / LTR Typography */
+/* RTL / LTR Typography System */
 [dir="ltr"] {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 [dir="rtl"] {
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'IBM Plex Sans Arabic', 'Readex Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0;
+}
+
+/* Editorial Serif Headings */
+.font-editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-readex {
+  font-family: 'Readex Pro', 'IBM Plex Sans Arabic', sans-serif;
 }
 
 /* ============================================================
-   LUXURY SCROLLBAR
+   LENIS SMOOTH SCROLL SUPPORT (ONE GREEN WAY SPEC)
+   ============================================================ */
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ============================================================
+   LUXURY EMERALD SCROLLBAR
    ============================================================ */
 
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: #1B2C26;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C9A050;
-  border-radius: 2px;
+  background: #103C32;
+  border-radius: 9999px;
+  border: 1px solid rgba(198, 164, 91, 0.3);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #DFBA68;
+  background: #C6A45B;
 }
 
 /* ============================================================
-   UTILITY CLASSES & COMPONENTS
+   UTILITY CLASSES & DESIGN TOKENS
    ============================================================ */
 
 @layer components {
-  /* Primary Black Luxury Button */
-  .btn-primary {
-    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-dark text-white font-semibold rounded-none
-           hover:bg-gold hover:text-dark transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5
-           border border-dark hover:border-gold text-xs tracking-[0.2em] uppercase;
+  /* Primary Emerald Luxury Button */
+  .btn-primary,
+  .btn-emerald {
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-primary text-white font-medium
+           rounded-xl hover:bg-forest transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5
+           border border-primary/80 text-xs sm:text-sm tracking-wide;
   }
 
-  /* Gold Luxury Button */
+  /* Champagne Gold Accent Button (Used Sparingly) */
   .btn-gold {
-    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-gold text-dark font-bold rounded-none
-           hover:bg-gold-light transition-all duration-300 hover:shadow-gold hover:-translate-y-0.5
-           border border-gold text-xs tracking-[0.2em] uppercase;
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-gold text-forest font-semibold
+           rounded-xl hover:bg-gold-light transition-all duration-300 hover:shadow-md hover:-translate-y-0.5
+           border border-gold text-xs sm:text-sm tracking-wide;
   }
 
-  /* White Outline Button */
-  .btn-outline {
-    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-transparent text-white font-semibold rounded-none
-           border border-white/40 hover:border-gold hover:text-gold transition-all duration-300
-           text-xs tracking-[0.2em] uppercase;
+  /* Outline Emerald Button */
+  .btn-outline,
+  .btn-outline-emerald {
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-transparent text-primary font-medium
+           rounded-xl border border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300
+           text-xs sm:text-sm tracking-wide dark:text-ivory dark:border-ivory/30 dark:hover:border-ivory dark:hover:bg-ivory/10;
   }
 
-  /* Gold Outline Button */
+  /* Outline Gold Button */
   .btn-outline-gold {
-    @apply inline-flex items-center gap-2.5 px-8 py-4 bg-transparent text-gold font-semibold rounded-none
-           border border-gold/50 hover:bg-gold hover:text-dark transition-all duration-300
-           text-xs tracking-[0.2em] uppercase;
+    @apply inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-transparent text-gold font-medium
+           rounded-xl border border-gold/40 hover:bg-gold/10 hover:border-gold transition-all duration-300
+           text-xs sm:text-sm tracking-wide;
   }
 
   /* Typography */
   .section-title {
-    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-dark dark:text-white leading-[1.15] tracking-tight;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-forest dark:text-white leading-[1.15] tracking-tight;
   }
 
   .section-subtitle {
-    @apply text-gold font-semibold tracking-[0.3em] uppercase text-xs mb-3 inline-block;
+    @apply text-primary dark:text-gold font-semibold tracking-[0.25em] uppercase text-xs mb-3 inline-flex items-center gap-2;
   }
 
-  /* Luxury Card Base */
+  /* Luxury Architectural Card Base */
   .card-luxury {
-    @apply bg-white dark:bg-dark-100 border border-gray-100 dark:border-gray-800/80 shadow-luxury hover:shadow-luxury-dark 
-           transition-all duration-500 hover:-translate-y-1.5 overflow-hidden rounded-none;
+    @apply bg-white dark:bg-forest/40 border border-beige/60 dark:border-white/10 shadow-sm hover:shadow-xl
+           transition-all duration-500 hover:-translate-y-1.5 overflow-hidden rounded-2xl;
   }
 
   .gold-divider {
@@ -130,25 +246,34 @@ body {
 
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #DFBA68 0%, #C9A050 50%, #A47E33 100%);
+    background-image: linear-gradient(135deg, #D8BC79 0%, #C6A45B 50%, #A8863D 100%);
+  }
+
+  .text-gradient-emerald {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #103C32 0%, #164F42 50%, #263B34 100%);
   }
 
   .overlay-dark {
-    @apply absolute inset-0 bg-black/65;
+    @apply absolute inset-0 bg-forest/80;
   }
 
   .overlay-gradient {
     @apply absolute inset-0;
-    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.4) 60%, transparent 100%);
+    background: linear-gradient(to top, rgba(16,60,50,0.92) 0%, rgba(16,60,50,0.45) 60%, transparent 100%);
   }
 
   /* Glassmorphism Luxury Cards */
   .glass-card-dark {
-    @apply bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl;
+    @apply bg-forest/80 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl;
   }
 
-  .glass-card-gold {
-    @apply bg-black/70 backdrop-blur-2xl border border-gold/25 shadow-2xl;
+  .glass-card-emerald {
+    @apply bg-primary/85 backdrop-blur-xl border border-primary-light/30 shadow-2xl rounded-2xl;
+  }
+
+  .glass-card-ivory {
+    @apply bg-white/80 backdrop-blur-xl border border-beige/60 shadow-lg rounded-2xl;
   }
 
   .nav-link {
@@ -159,70 +284,81 @@ body {
 }
 
 /* ============================================================
-   MARQUEE / PARTNER LOGOS
+   INFINITE MARQUEE TICKER (ONE GREEN WAY SPEC)
    ============================================================ */
 
+.marquee_container,
 .marquee-container {
   overflow: hidden;
   width: 100%;
 }
 
+.marquee_track,
 .marquee-track {
   display: flex;
-  gap: 60px;
   width: max-content;
-  animation: marquee 35s linear infinite;
-}
-
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  will-change: transform;
 }
 
 /* ============================================================
-   SWIPER CUSTOM
+   SWIPER CUSTOM STYLING (EMERALD & GOLD)
    ============================================================ */
 
 .swiper-pagination-bullet {
-  background: #C9A050 !important;
-  opacity: 0.3;
+  background: #103C32 !important;
+  opacity: 0.35;
   width: 8px;
   height: 8px;
+  transition: all 0.3s ease;
+}
+
+.dark .swiper-pagination-bullet {
+  background: #C6A45B !important;
 }
 
 .swiper-pagination-bullet-active {
   opacity: 1 !important;
-  width: 24px;
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  width: 28px;
+  border-radius: 9999px;
+  background: #C6A45B !important;
 }
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #C9A050 !important;
-  background: rgba(10, 10, 10, 0.85);
-  border: 1px solid rgba(201, 160, 80, 0.3);
+  color: #103C32 !important;
+  background: #FFFFFF;
+  border: 1px solid #D8D2C6;
   width: 48px !important;
   height: 48px !important;
-  border-radius: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.dark .swiper-button-next,
+.dark .swiper-button-prev {
+  color: #C6A45B !important;
+  background: #103C32;
+  border: 1px solid rgba(198, 164, 91, 0.25);
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: #103C32;
+  color: #FFFFFF !important;
+  border-color: #103C32;
+}
+
+.dark .swiper-button-next:hover,
+.dark .swiper-button-prev:hover {
+  background: #C6A45B;
+  color: #103C32 !important;
 }
 
 .swiper-button-next::after,
 .swiper-button-prev::after {
-  font-size: 16px !important;
-}
-
-/* ============================================================
-   DARK MODE OVERRIDES
-   ============================================================ */
-
-.dark .card-luxury {
-  background: #121212;
-  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 15px !important;
+  font-weight: bold;
 }
 
 /* ============================================================
@@ -230,6 +366,428 @@ body {
    ============================================================ */
 
 ::selection {
-  background: rgba(201, 160, 80, 0.25);
-  color: #C9A050;
+  background: rgba(16, 60, 50, 0.2);
+  color: #103C32;
+}
+
+.dark ::selection {
+  background: rgba(198, 164, 91, 0.3);
+  color: #C6A45B;
+}
+
+/* ============================================================
+   ONE GREEN WAY LUXURY VIDEO CINEMA & HOVER PREVIEW
+   ============================================================ */
+
+.video-hover-preview {
+  position: relative;
+  isolation: isolate;
+  user-select: none;
+}
+
+.video-hover-preview .video-preview-image {
+  will-change: opacity;
+}
+
+.video-hover-preview .preview-icon_wrapper {
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.section_full-video {
+  isolation: isolate;
+}
+
+.section_full-video .video-controls,
+.section_full-video .video-name {
+  will-change: transform, opacity;
+}
+
+.section_full-video .progress-bar {
+  touch-action: none;
+}
+
+.section_full-video .progress-fill,
+.section_full-video .progress-thumb {
+  will-change: width, left;
+}
+
+/* ============================================================
+   LENIS SMOOTH SCROLL SPECIFICATION (ONE GREEN WAY SPEC)
+   ============================================================ */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ============================================================
+   ARCHITECTURAL SPACERS SYSTEM (ONE GREEN WAY SPECIFICATION)
+   ============================================================ */
+
+.spacer-0-125 { width: 100%; padding-top: 0.125rem; }
+.spacer-0-25  { width: 100%; padding-top: 0.25rem; }
+.spacer-0-5   { width: 100%; padding-top: 0.5rem; }
+.spacer-1     { width: 100%; padding-top: 1rem; }
+.spacer-1-25  { width: 100%; padding-top: 1.25rem; }
+.spacer-1-5   { width: 100%; padding-top: 1.5rem; }
+.spacer-2     { width: 100%; padding-top: 2rem; }
+.spacer-2-5   { width: 100%; padding-top: 2.5rem; }
+.spacer-3     { width: 100%; padding-top: 3rem; }
+.spacer-3-5   { width: 100%; padding-top: 3.5rem; }
+.spacer-4     { width: 100%; padding-top: 4rem; }
+.spacer-4-5   { width: 100%; padding-top: 4.5rem; }
+.spacer-5     { width: 100%; padding-top: 5rem; }
+.spacer-5-5   { width: 100%; padding-top: 5.5rem; }
+.spacer-6     { width: 100%; padding-top: 6rem; }
+.spacer-6-5   { width: 100%; padding-top: 6.5rem; }
+.spacer-7     { width: 100%; padding-top: 7rem; }
+.spacer-7-5   { width: 100%; padding-top: 7.5rem; }
+.spacer-8     { width: 100%; padding-top: 8rem; }
+.spacer-8-5   { width: 100%; padding-top: 8.5rem; }
+.spacer-9     { width: 100%; padding-top: 9rem; }
+.spacer-9-5   { width: 100%; padding-top: 9.5rem; }
+.spacer-10    { width: 100%; padding-top: 10rem; }
+.spacer-12    { width: 100%; padding-top: 12rem; }
+.spacer-16    { width: 100%; padding-top: 16rem; }
+
+/* ============================================================
+   ARCHITECTURAL GRID & PADDING (ONE GREEN WAY SPECIFICATION)
+   ============================================================ */
+
+.padding-global {
+  padding-right: var(--_grid-padding-global---padding-global--size);
+  padding-left: var(--_grid-padding-global---padding-global--size);
+}
+
+.grid-base {
+  display: grid;
+  grid-column-gap: var(--_grid-padding-global---grid--grid-gap);
+  grid-row-gap: var(--_grid-padding-global---grid--grid-gap);
+  grid-template-columns: repeat(12, 1fr);
+  width: 100%;
+}
+
+@media (max-width: 991px) {
+  .grid-base {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .grid-base {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   ARCHITECTURAL ACCORDION & CONSTRUCTION REPORT
+   (ONE GREEN WAY SPECIFICATION - PRESERVING EMERALD & GOLD)
+   ============================================================ */
+
+.accordion-css {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.accordion-css__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.accordion-css__item {
+  border-bottom: 1px solid rgba(119, 125, 118, 0.25);
+  list-style: none;
+  transition: border-color 0.3s ease;
+}
+
+.accordion-css__item:hover {
+  border-bottom-color: var(--_colors---colors--sun-yellow);
+}
+
+.accordion-css__item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.75rem;
+  padding-bottom: 1.75rem;
+  cursor: pointer;
+  gap: 1.5rem;
+  user-select: none;
+}
+
+.accordion-css__item-h3 {
+  font-family: var(--font--secondary-family);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--_colors---colors--black);
+  transition: color 0.3s ease;
+}
+
+.dark .accordion-css__item-h3 {
+  color: #FFFFFF;
+}
+
+.accordion-css__item:hover .accordion-css__item-h3 {
+  color: var(--_colors---colors--sun-yellow);
+}
+
+.accordion-css__item-icon {
+  background-color: var(--_colors---colors--sun-yellow);
+  color: var(--_colors---colors--white);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.accordion-css__item-icon.is-active {
+  transform: rotate(45deg);
+  background-color: var(--_colors---colors--black);
+}
+
+.accordion-css__item-bottom {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.accordion-css__item-bottom.is-open {
+  grid-template-rows: 1fr;
+}
+
+.accordion-css__item-bottom-wrap {
+  overflow: hidden;
+}
+
+.accordion-css__item-bottom-content {
+  padding-bottom: 2rem;
+  color: #4A5550;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.dark .accordion-css__item-bottom-content {
+  color: #D8D2C6;
+}
+
+/* ============================================================
+   PROJECT PROGRESS / CONSTRUCTION TIMELINE & METRICS GRAPH
+   ============================================================ */
+
+.report-timeline-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  margin-top: 3.5rem;
+}
+
+.report-timeline {
+  background-color: var(--_colors---colors--sun-yellow);
+  height: 1px;
+  position: relative;
+  width: 100%;
+}
+
+.report-timeline-dot {
+  background-color: var(--_colors---colors--sun-yellow);
+  border-radius: 9999px;
+  width: 0.75rem;
+  height: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.report-timeline-dot:hover {
+  transform: scale(1.4);
+}
+
+.report-graph {
+  border-radius: 0.75rem;
+  background-color: #FFFFFF;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  height: 14rem;
+  border: 1px solid rgba(198, 164, 91, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.dark .report-graph {
+  background-color: #1B2C26;
+  border-color: rgba(198, 164, 91, 0.2);
+}
+
+.report-graph-value {
+  font-family: var(--font--secondary-family);
+  font-size: 4rem;
+  font-style: italic;
+  line-height: 1.1;
+  color: var(--_colors---colors--black);
+  position: relative;
+  z-index: 2;
+}
+
+.dark .report-graph-value {
+  color: #FFFFFF;
+}
+
+.report-graph-bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--_colors---colors--neutral-yellow);
+  border-radius: 0.75rem;
+  z-index: 0;
+  transition: width 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.dark .report-graph-bg {
+  background-color: rgba(16, 60, 50, 0.4);
+}
+
+/* ============================================================
+   RESIDENCE SPECIFICATIONS & EDITORIAL NUMBERS
+   ============================================================ */
+
+.residence-big-number {
+  font-family: var(--font--secondary-family);
+  font-size: 6.5rem;
+  font-weight: 300;
+  line-height: 0.9em;
+  color: var(--_colors---colors--sun-yellow);
+  letter-spacing: -0.04em;
+}
+
+@media (max-width: 767px) {
+  .residence-big-number {
+    font-size: 4rem;
+  }
+}
+
+.residence-number_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+}
+
+.residence-number-title {
+  color: var(--_colors---colors--brown);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.residences-numbers {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--_colors---colors--black);
+}
+
+.dark .residences-numbers {
+  color: #FFFFFF;
+}
+
+/* Custom Interactive Micro-badge */
+.video-hover-arrow_wrapper {
+  z-index: 2;
+  aspect-ratio: 1;
+  background-color: var(--_colors---colors--sun-yellow);
+  pointer-events: none;
+  border-radius: 9999px;
+  justify-content: center;
+  align-items: center;
+  width: 6rem;
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 30px rgba(198, 164, 91, 0.4);
+}
+
+.cursor {
+  z-index: 9999;
+  background-color: var(--_colors---colors--sun-yellow);
+  opacity: 0;
+  pointer-events: none;
+  color: #FFFFFF;
+  border-radius: 0.25rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+  position: fixed;
+  inset: 0 auto auto 0;
+}
+
+/* ============================================================
+   ACCESSIBILITY & FOCUS-VISIBLE SPECIFICATION (ONE GREEN WAY SPEC)
+   ============================================================ */
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible,
+[data-wf-focus-visible] {
+  outline: 2px solid var(--_colors---colors--sun-yellow);
+  outline-offset: 3px;
+}
+
+/* Form States & Interactive Toggles (One Green Way Spec) */
+.w-form-done {
+  background-color: var(--_colors---colors--neutral-yellow);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  color: var(--_colors---colors--black);
+}
+
+.w-form-fail {
+  background-color: #FEE2E2;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  color: #991B1B;
+}
+
+.w-checkbox-input,
+.w-radio-input {
+  transition: all 0.25s ease;
+}
+
+.w-checkbox-input.w--redirected-checked,
+.w-radio-input.w--redirected-checked {
+  border-color: var(--_colors---colors--sun-yellow);
+  background-color: var(--_colors---colors--sun-yellow);
 }

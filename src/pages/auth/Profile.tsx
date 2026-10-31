@@ -6,6 +6,37 @@ import { FiUser, FiPhone, FiLock, FiCamera, FiCheckCircle, FiAlertCircle, FiMail
 import { motion, AnimatePresence } from 'framer-motion';
 import PhoneVerification from '../../components/auth/PhoneVerification';
 
+interface VerificationBadgeProps {
+  verified: boolean;
+  label: string;
+  lang: string;
+  onAction?: () => void;
+  actionLabel?: string;
+}
+
+function VerificationBadge({ verified, label, lang, onAction, actionLabel }: VerificationBadgeProps) {
+  return (
+    <div className={`flex items-center justify-between p-3.5 rounded-xl border ${verified ? 'bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800' : 'bg-amber-50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-800'}`}>
+      <div className="flex items-center gap-2.5">
+        {verified
+          ? <FiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+          : <FiAlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />}
+        <div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+          <p className={`text-sm font-semibold ${verified ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-amber-400'}`}>
+            {verified ? (lang === 'ar' ? 'مؤكد ✓' : 'Verified ✓') : (lang === 'ar' ? 'غير مؤكد ⚠' : 'Unverified ⚠')}
+          </p>
+        </div>
+      </div>
+      {!verified && onAction && (
+        <button onClick={onAction} className="text-xs text-gold hover:underline font-medium px-2.5 py-1 rounded bg-gold/10">
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function Profile() {
   const { profile, refreshProfile, user, isEmailVerified, isPhoneVerified, signOut } = useAuth();
   const { lang, isRTL } = useLang();
@@ -158,27 +189,6 @@ export default function Profile() {
     customer: lang === 'ar' ? 'عميل' : 'Customer',
   };
 
-  const VerificationBadge = ({ verified, label, onAction, actionLabel }: { verified: boolean; label: string; onAction?: () => void; actionLabel?: string }) => (
-    <div className={`flex items-center justify-between p-3.5 rounded-xl border ${verified ? 'bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800' : 'bg-amber-50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-800'}`}>
-      <div className="flex items-center gap-2.5">
-        {verified
-          ? <FiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-          : <FiAlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />}
-        <div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-          <p className={`text-sm font-semibold ${verified ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-amber-400'}`}>
-            {verified ? (lang === 'ar' ? 'مؤكد ✓' : 'Verified ✓') : (lang === 'ar' ? 'غير مؤكد ⚠' : 'Unverified ⚠')}
-          </p>
-        </div>
-      </div>
-      {!verified && onAction && (
-        <button onClick={onAction} className="text-xs text-gold hover:underline font-medium px-2.5 py-1 rounded bg-gold/10">
-          {actionLabel}
-        </button>
-      )}
-    </div>
-  );
-
   return (
     <div className="min-h-screen pt-32 pb-20 bg-surface dark:bg-dark">
       <AnimatePresence>
@@ -263,12 +273,14 @@ export default function Profile() {
                 <VerificationBadge
                   verified={isEmailVerified}
                   label={lang === 'ar' ? 'البريد الإلكتروني' : 'Email Verification'}
+                  lang={lang}
                   onAction={handleResendEmail}
                   actionLabel={resendingEmail ? (lang === 'ar' ? 'جاري الإرسال...' : 'Sending...') : (lang === 'ar' ? 'إعادة الإرسال' : 'Resend Link')}
                 />
                 <VerificationBadge
                   verified={isPhoneVerified}
                   label={lang === 'ar' ? 'رقم الهاتف' : 'Phone Verification'}
+                  lang={lang}
                   onAction={() => setShowPhoneVerification(true)}
                   actionLabel={lang === 'ar' ? 'تأكيد الآن' : 'Verify Now'}
                 />

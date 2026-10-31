@@ -4,10 +4,10 @@ import { supabase } from '../../lib/supabase';
 import { inquiriesService } from '../../services/inquiries';
 import type { Inquiry } from '../../services/inquiries';
 import {
-  FiInbox, FiSearch, FiFilter, FiRefreshCw,
+  FiInbox, FiSearch, FiRefreshCw,
   FiUser, FiMail, FiPhone, FiMessageSquare,
-  FiCalendar, FiEdit3, FiTrash2, FiX,
-  FiCheckCircle, FiAlertCircle, FiClock, FiChevronDown,
+  FiEdit3, FiTrash2, FiX,
+  FiCheckCircle, FiAlertCircle, FiClock,
   FiBell,
 } from 'react-icons/fi';
 

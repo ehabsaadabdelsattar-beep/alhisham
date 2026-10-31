@@ -7,13 +7,16 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import FloatingWhatsApp from './components/layout/FloatingWhatsApp';
-import AIChat from './components/AIChat';
 import ScrollToTop from './components/ui/ScrollToTop';
-import ScrollProgress from './components/ui/ScrollProgress';
-import SplashScreen from './components/ui/SplashScreen';
+import SmoothScroll from './components/ui/SmoothScroll';
+import PageCurtainTransition from './components/ui/PageCurtainTransition';
 import PageTransition from './components/ui/PageTransition';
 import { AuthProvider } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { VideoModalProvider } from './context/VideoModalContext';
+import LuxuryVideoModal from './components/ui/LuxuryVideoModal';
+import { BrochureModalProvider } from './context/BrochureModalContext';
+import { BrochureModal } from './components/ui/BrochureModal';
 import { ProtectedRoute } from './components/ProtectedRoute';
 // Lazy loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -107,8 +110,7 @@ function AnimatedRoutes() {
       {!isAdmin && (
         <>
           <Footer />
-          <FloatingWhatsApp />
-          <AIChat />
+          {location.pathname === '/contact' && <FloatingWhatsApp />}
         </>
       )}
     </>
@@ -122,14 +124,20 @@ export default function App() {
         <SettingsProvider>
           <LanguageProvider>
             <ThemeProvider>
-              <BrowserRouter>
-                <SplashScreen />
-                <ScrollProgress />
-                <ScrollToTop />
-                <div className="min-h-screen bg-surface dark:bg-dark text-dark dark:text-white transition-colors duration-300">
-                  <AnimatedRoutes />
-                </div>
-              </BrowserRouter>
+              <VideoModalProvider>
+                <BrochureModalProvider>
+                  <BrowserRouter>
+                    <PageCurtainTransition />
+                    <ScrollToTop />
+                    <SmoothScroll />
+                    <LuxuryVideoModal />
+                    <BrochureModal />
+                    <div className="min-h-screen bg-surface dark:bg-dark text-dark dark:text-white transition-colors duration-300">
+                      <AnimatedRoutes />
+                    </div>
+                  </BrowserRouter>
+                </BrochureModalProvider>
+              </VideoModalProvider>
             </ThemeProvider>
           </LanguageProvider>
         </SettingsProvider>

@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { financeService } from '../../services/finance';
 import type { Expense } from '../../services/finance';
 import {
-  FiCreditCard, FiFilter, FiDownload, FiPlus, FiSearch,
+  FiCreditCard, FiDownload, FiPlus,
   FiEdit3, FiXCircle, FiX
 } from 'react-icons/fi';
 

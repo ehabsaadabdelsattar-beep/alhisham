@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -10,28 +10,37 @@ import type { Project } from '../../services/projects';
 import {
   FiActivity, FiTrendingUp, FiTrendingDown, FiBox, FiUsers,
   FiMessageSquare, FiDollarSign, FiPieChart, FiCalendar,
-  FiArrowUpRight, FiEye, FiClock, FiCheckCircle, FiTool,
-  FiAlertCircle
+  FiEye, FiTool, FiAlertCircle
 } from 'react-icons/fi';
 
 // ─────────────────────────────────────────────────────────────────
 // Components
 // ─────────────────────────────────────────────────────────────────
-function StatCard({ label, value, icon: Icon, color, trend, trendValue, prefix = '' }: any) {
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  trend?: string;
+  trendValue?: string | number;
+  prefix?: string;
+}
+
+function StatCard({ label, value, icon: Icon, color, trend, trendValue, prefix = '' }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-dark-light rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden group"
+      className="bg-white dark:bg-forest rounded-2xl p-5 border border-beige/70 dark:border-white/10 shadow-sm relative overflow-hidden group font-sans"
     >
       <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-10 ${color} group-hover:opacity-20 transition-opacity`} />
       
       <div className="flex items-start justify-between mb-4 relative">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} bg-opacity-10 dark:bg-opacity-20`}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} bg-opacity-10 dark:bg-opacity-25`}>
           <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-md ${trend === 'up' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-50 text-red-600 dark:bg-red-900/30'}`}>
+          <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg ${trend === 'up' ? 'bg-emerald/10 text-emerald dark:text-gold' : 'bg-red-50 text-red-600 dark:bg-red-900/30'}`}>
             {trend === 'up' ? <FiTrendingUp /> : <FiTrendingDown />}
             {trendValue}%
           </div>
@@ -125,21 +134,21 @@ export default function AdminDashboard() {
     <div className="space-y-8" dir="rtl">
       
       {/* ═══ Header & Filters ═══ */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-dark-light p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-forest p-6 rounded-2xl border border-beige/70 dark:border-white/10 shadow-sm font-sans">
         <div>
-          <h1 className="text-2xl font-bold text-dark dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-forest dark:text-ivory flex items-center gap-2">
             <FiPieChart className="text-gold" />
             مركز التحكم الموحد
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Company Control Center — {profile?.full_name}</p>
+          <p className="text-sm text-textSecondary dark:text-gray-300 mt-1">Company Control Center — {profile?.full_name}</p>
         </div>
         
         <div className="flex items-center gap-2">
-          <FiCalendar className="text-gray-400 w-4 h-4" />
+          <FiCalendar className="text-textSecondary w-4 h-4" />
           <select 
             value={dateRange} 
             onChange={e => setDateRange(e.target.value)}
-            className="bg-gray-50 dark:bg-dark border border-gray-200 dark:border-gray-700 rounded-lg py-2 px-4 text-sm font-medium focus:outline-none focus:border-gold"
+            className="bg-ivory dark:bg-forest-dark border border-beige/80 dark:border-white/15 rounded-xl py-2 px-4 text-sm font-medium text-forest dark:text-ivory focus:outline-none focus:border-emerald"
           >
             <option value="today">اليوم</option>
             <option value="7days">آخر 7 أيام</option>
@@ -159,43 +168,43 @@ export default function AdminDashboard() {
         <>
           {/* ═══ Executive KPIs ═══ */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <StatCard label="إجمالي المشاريع" value={kpis.total_projects} icon={FiBox} color="bg-blue-500" />
-            <StatCard label="مشاريع نشطة" value={kpis.active_projects} icon={FiTool} color="bg-amber-500" />
-            <StatCard label="إجمالي العملاء" value={kpis.total_customers} icon={FiUsers} color="bg-purple-500" />
-            <StatCard label="الطلبات (Leads)" value={kpis.total_leads} icon={FiMessageSquare} color="bg-pink-500" />
-            <StatCard label="مشاهدات الموقع" value={kpis.total_views} icon={FiEye} color="bg-emerald-500" trend="up" trendValue={12} />
+            <StatCard label="إجمالي المشاريع" value={kpis.total_projects} icon={FiBox} color="bg-emerald" />
+            <StatCard label="مشاريع نشطة" value={kpis.active_projects} icon={FiTool} color="bg-gold" />
+            <StatCard label="إجمالي العملاء" value={kpis.total_customers} icon={FiUsers} color="bg-forest" />
+            <StatCard label="الطلبات (Leads)" value={kpis.total_leads} icon={FiMessageSquare} color="bg-emerald-light" />
+            <StatCard label="مشاهدات الموقع" value={kpis.total_views} icon={FiEye} color="bg-emerald" trend="up" trendValue={12} />
           </div>
 
           {/* ═══ Financial Overview (Admin Only) ═══ */}
           {isAdmin && (
-            <div className="bg-white dark:bg-dark-light rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
+            <div className="bg-white dark:bg-forest rounded-2xl border border-beige/70 dark:border-white/10 p-6 shadow-sm font-sans">
               <div className="flex items-center gap-2 mb-6">
                 <FiDollarSign className="w-5 h-5 text-gold" />
-                <h2 className="text-lg font-bold text-dark dark:text-white">اللوحة المالية (Financial Overview)</h2>
+                <h2 className="text-lg font-bold text-forest dark:text-white">اللوحة المالية (Financial Overview)</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-5 rounded-xl bg-gray-50 dark:bg-dark border border-gray-100 dark:border-gray-800">
-                  <p className="text-sm text-gray-500 mb-1">الإيرادات (Revenue)</p>
-                  <p className="text-2xl font-bold text-emerald-600">EGP {kpis.total_revenue.toLocaleString('ar-EG')}</p>
+                <div className="p-5 rounded-xl bg-ivory/60 dark:bg-forest-dark border border-beige/60 dark:border-white/10">
+                  <p className="text-sm text-textSecondary dark:text-gray-400 mb-1">الإيرادات (Revenue)</p>
+                  <p className="text-2xl font-bold text-emerald dark:text-gold">EGP {kpis.total_revenue.toLocaleString('ar-EG')}</p>
                 </div>
-                <div className="p-5 rounded-xl bg-gray-50 dark:bg-dark border border-gray-100 dark:border-gray-800">
-                  <p className="text-sm text-gray-500 mb-1">المصروفات (Expenses)</p>
-                  <p className="text-2xl font-bold text-red-600">EGP {kpis.total_expenses.toLocaleString('ar-EG')}</p>
+                <div className="p-5 rounded-xl bg-ivory/60 dark:bg-forest-dark border border-beige/60 dark:border-white/10">
+                  <p className="text-sm text-textSecondary dark:text-gray-400 mb-1">المصروفات (Expenses)</p>
+                  <p className="text-2xl font-bold text-red-600 dark:text-red-400">EGP {kpis.total_expenses.toLocaleString('ar-EG')}</p>
                 </div>
-                <div className="p-5 rounded-xl bg-gray-50 dark:bg-dark border border-gray-100 dark:border-gray-800">
-                  <p className="text-sm text-gray-500 mb-1">صافي الربح (Net Profit)</p>
-                  <p className={`text-2xl font-bold ${kpis.net_profit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                <div className="p-5 rounded-xl bg-ivory/60 dark:bg-forest-dark border border-beige/60 dark:border-white/10">
+                  <p className="text-sm text-textSecondary dark:text-gray-400 mb-1">صافي الربح (Net Profit)</p>
+                  <p className={`text-2xl font-bold ${kpis.net_profit >= 0 ? 'text-forest dark:text-ivory' : 'text-red-600'}`}>
                     EGP {kpis.net_profit.toLocaleString('ar-EG')}
                   </p>
                 </div>
               </div>
 
               {transactions.length === 0 && (
-                <div className="mt-6 flex flex-col items-center justify-center py-8 bg-gray-50 dark:bg-dark/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-                  <FiAlertCircle className="w-8 h-8 text-gray-400 mb-3" />
-                  <p className="text-gray-500 font-medium">لا توجد معاملات مالية مسجلة بعد.</p>
-                  <p className="text-sm text-gray-400 mt-1">Setup Required: ابدأ بإضافة الـ Transactions لتفعيل الحسابات.</p>
+                <div className="mt-6 flex flex-col items-center justify-center py-8 bg-ivory/40 dark:bg-forest-dark/50 rounded-xl border border-dashed border-beige/80 dark:border-white/15">
+                  <FiAlertCircle className="w-8 h-8 text-gold mb-3" />
+                  <p className="text-textSecondary dark:text-gray-300 font-medium">لا توجد معاملات مالية مسجلة بعد.</p>
+                  <p className="text-sm text-textSecondary/80 dark:text-gray-400 mt-1">ابدأ بإضافة المعاملات لتفعيل موازنة الحسابات.</p>
                 </div>
               )}
             </div>

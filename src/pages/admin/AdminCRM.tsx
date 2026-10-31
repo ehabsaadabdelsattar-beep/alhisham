@@ -1,15 +1,13 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { crmService } from '../../services/crm';
-import type { Lead, LeadStatus, LeadSource, InquiryNote, CRMAnalytics } from '../../services/crm';
-import { projectsService } from '../../services/projects';
-import type { Project } from '../../services/projects';
+import type { Lead, LeadStatus, InquiryNote, CRMAnalytics } from '../../services/crm';
 import {
-  FiTarget, FiPhone, FiMail, FiMessageCircle, FiUser, FiCalendar,
-  FiEdit3, FiX, FiPlus, FiSearch, FiDownload, FiClock, FiAlertCircle,
-  FiCheckCircle, FiChevronRight, FiActivity, FiBarChart2, FiSend,
+  FiTarget, FiPhone, FiMail, FiMessageCircle,
+  FiEdit3, FiX, FiSearch, FiDownload, FiAlertCircle,
+  FiSend,
 } from 'react-icons/fi';
 
 // ─────────────────────────────────────────────────────────────────

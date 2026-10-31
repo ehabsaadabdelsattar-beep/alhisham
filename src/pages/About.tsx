@@ -32,9 +32,9 @@ export default function About() {
       <AboutSection />
 
       {/* Stats Banner */}
-      <section className="bg-primary py-16">
+      <section className="bg-ivory py-16 border-y border-beige/70">
         <div className="container-custom">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/10 rtl:divide-x-reverse">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-beige/80 rtl:divide-x-reverse">
             {[
               { num: '15+', label: t('stats.years') },
               { num: '87+', label: t('stats.projects') },
@@ -42,8 +42,8 @@ export default function About() {
               { num: '850K+', label: t('stats.sqm') },
             ].map((stat, i) => (
               <div key={i} className="text-center px-4">
-                <div className="text-4xl md:text-5xl font-bold text-gold mb-2 font-english">{stat.num}</div>
-                <div className="text-white/80 text-sm md:text-base">{stat.label}</div>
+                <div className="text-4xl md:text-5xl font-bold text-emerald mb-2 font-english">{stat.num}</div>
+                <div className="text-textSecondary text-xs sm:text-sm uppercase tracking-wider font-sans font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -51,26 +51,26 @@ export default function About() {
       </section>
 
       {/* CEO Message */}
-      <section className="section-padding bg-surface dark:bg-dark-200">
+      <section className="section-padding bg-ivory text-forest">
         <div className="container-custom">
-          <div className="max-w-4xl mx-auto bg-white dark:bg-dark-300 p-8 md:p-12 shadow-luxury flex flex-col md:flex-row gap-8 items-center">
-            <div className="w-48 h-48 rounded-full overflow-hidden flex-shrink-0 border-4 border-gold">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-beige/80 p-8 md:p-12 shadow-sm hover:shadow-xl transition-shadow flex flex-col md:flex-row gap-8 items-center">
+            <div className="w-44 h-44 rounded-2xl overflow-hidden flex-shrink-0 border-2 border-gold/40 shadow-md">
               <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80" alt="CEO" className="w-full h-full object-cover" />
             </div>
             <div>
-              <svg className="w-10 h-10 text-gold/30 mb-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-10 h-10 text-gold/40 mb-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
               </svg>
-              <p className="text-gray-600 dark:text-gray-300 text-lg md:text-xl leading-relaxed italic mb-6">
+              <p className="text-textSecondary text-base sm:text-lg leading-relaxed italic mb-6 font-sans">
                 {lang === 'ar'
                   ? 'نسعى دائماً لتقديم مشاريع عقارية تتجاوز توقعات عملائنا، من خلال التزامنا الراسخ بالجودة والابتكار. نحن لا نبني مجرد مبانٍ، بل نصنع بيئات حياة متكاملة تستمر للأجيال.'
                   : 'We always strive to deliver real estate projects that exceed our clients\' expectations, through our steadfast commitment to quality and innovation. We don\'t just build buildings, we create integrated living environments that last for generations.'}
               </p>
-              <h4 className="font-bold text-dark dark:text-white text-lg">
+              <h4 className="font-bold text-forest text-lg font-sans">
                 {lang === 'ar' ? 'المهندس / هشام العقاري' : 'Eng. Hisham Al-Aqari'}
               </h4>
-              <p className="text-gold text-sm">
-                {lang === 'ar' ? 'الرئيس التنفيذي' : 'Chief Executive Officer'}
+              <p className="text-gold text-xs font-semibold uppercase tracking-widest mt-0.5">
+                {lang === 'ar' ? 'الرئيس التنفيذي ومؤسس المجموعة' : 'CEO & Group Founder'}
               </p>
             </div>
           </div>

@@ -13,7 +13,7 @@ export default function PageCurtainTransition() {
 
   // Helper to safely control smooth scroll
   const getLenis = () => {
-    return (window as unknown as { __lenis?: { stop: () => void; start: () => void } }).__lenis;
+    return (window as unknown as { __lenis?: { stop: () => void; start: () => void; scrollTo?: (target: number, opts?: { immediate: boolean }) => void } }).__lenis;
   };
 
   // 1. Initial Page Load Animation (matching $(document).ready from onegreenway.pt)
@@ -139,7 +139,13 @@ export default function PageCurtainTransition() {
           navigate(href);
 
           // Scroll immediately to top on new page
-          window.scrollTo(0, 0);
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          const lenisNow = getLenis();
+          if (lenisNow && typeof lenisNow.scrollTo === 'function') {
+            lenisNow.scrollTo(0, { immediate: true });
+          }
 
           // Prepare bars for unveiling the new page:
           // Switch alignment to flex-end so bars pull away downwards smoothly
@@ -151,7 +157,16 @@ export default function PageCurtainTransition() {
               container.style.pointerEvents = 'none';
               wrapper.style.alignItems = 'flex-start';
               isNavigatingRef.current = false;
-              lenis?.start();
+              
+              // Ensure we are definitely at the top when the curtain fully lifts
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+              document.documentElement.scrollTop = 0;
+              document.body.scrollTop = 0;
+              const activeLenis = getLenis();
+              if (activeLenis && typeof activeLenis.scrollTo === 'function') {
+                activeLenis.scrollTo(0, { immediate: true });
+              }
+              activeLenis?.start();
             },
           });
 
